@@ -1,10 +1,3 @@
-['mobile-hero.css?v=20260724-4', 'social-icons.css?v=20260724-4'].forEach(href => {
-  const stylesheet = document.createElement('link');
-  stylesheet.rel = 'stylesheet';
-  stylesheet.href = href;
-  document.head.appendChild(stylesheet);
-});
-
 const config = window.LXE_CONFIG || {};
 
 const menuButton = document.querySelector('.menu-button');
