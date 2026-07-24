@@ -4,3 +4,27 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   X-Frame-Options: SAMEORIGIN
   Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'self'
+
+/
+  Cache-Control: no-store, max-age=0
+
+/index.html
+  Cache-Control: no-store, max-age=0
+
+/styles.css
+  Cache-Control: no-cache, max-age=0, must-revalidate
+
+/mobile-hero.css
+  Cache-Control: no-cache, max-age=0, must-revalidate
+
+/social-icons.css
+  Cache-Control: no-cache, max-age=0, must-revalidate
+
+/script.js
+  Cache-Control: no-cache, max-age=0, must-revalidate
+
+/config.js
+  Cache-Control: no-cache, max-age=0, must-revalidate
+
+/public/images/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
