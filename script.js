@@ -1,7 +1,10 @@
-const mobileHeroStyles = document.createElement('link');
-mobileHeroStyles.rel = 'stylesheet';
-mobileHeroStyles.href = 'mobile-hero.css';
-document.head.appendChild(mobileHeroStyles);
+['mobile-hero.css', 'social-icons.css'].forEach(href => {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const stylesheet = document.createElement('link');
+  stylesheet.rel = 'stylesheet';
+  stylesheet.href = href;
+  document.head.appendChild(stylesheet);
+});
 
 const config = window.LXE_CONFIG || {};
 
@@ -46,24 +49,58 @@ if (emailLink) {
 const locationText = document.querySelector('#contact-location');
 if (locationText) locationText.textContent = config.location || 'Muskegon, Michigan';
 
-const socialNames = { instagram: 'IG', facebook: 'FB', tiktok: 'TT', pinterest: 'PI' };
+const socialPlatforms = [
+  {
+    name: 'instagram',
+    label: 'Instagram',
+    icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.7" r="1.15" fill="currentColor"/></svg>'
+  },
+  {
+    name: 'tiktok',
+    label: 'TikTok',
+    icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.59 6.69a4.79 4.79 0 0 1-3.77-4.25h-3.11v12.45a2.9 2.9 0 1 1-2.9-2.9c.23 0 .45.03.67.08V8.9a6.03 6.03 0 1 0 5.37 6V8.59a7.9 7.9 0 0 0 3.74.95V6.69Z"/></svg>'
+  },
+  {
+    name: 'facebook',
+    label: 'Facebook',
+    icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.8 21v-8h2.7l.4-3h-3.1V8.1c0-.9.3-1.5 1.6-1.5H17V3.9c-.7-.1-1.5-.2-2.3-.2-2.3 0-3.9 1.4-3.9 4V10H8.2v3h2.6v8h3Z"/></svg>'
+  }
+];
+
 const socialContainer = document.querySelector('#social-links');
-Object.entries(config.socials || {}).forEach(([name, url]) => {
-  if (!url || !socialContainer) return;
-  const link = document.createElement('a');
-  link.href = url;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  link.textContent = socialNames[name] || name.slice(0, 2);
-  link.setAttribute('aria-label', name);
-  socialContainer.appendChild(link);
-});
+if (socialContainer) {
+  const heading = document.createElement('p');
+  heading.className = 'social-heading';
+  heading.textContent = 'Follow LXE Photography';
+  socialContainer.before(heading);
+
+  socialPlatforms.forEach(({ name, label, icon }) => {
+    const url = config.socials?.[name];
+    const element = document.createElement(url ? 'a' : 'span');
+    element.className = `social-icon${url ? '' : ' social-placeholder'}`;
+    element.innerHTML = icon;
+    element.setAttribute('aria-label', url ? label : `${label} coming soon`);
+    element.title = url ? label : `${label} link coming soon`;
+
+    if (url) {
+      element.href = url;
+      element.target = '_blank';
+      element.rel = 'noopener noreferrer';
+    } else {
+      element.setAttribute('aria-disabled', 'true');
+    }
+
+    socialContainer.appendChild(element);
+  });
+}
+
 if (config.bookingUrl && socialContainer) {
   const bookingLink = document.createElement('a');
   bookingLink.href = config.bookingUrl;
   bookingLink.target = '_blank';
   bookingLink.rel = 'noopener noreferrer';
-  bookingLink.textContent = 'BOOK';
+  bookingLink.className = 'social-booking-link';
+  bookingLink.textContent = 'Book';
   bookingLink.setAttribute('aria-label', 'Book a session');
   socialContainer.appendChild(bookingLink);
 }
