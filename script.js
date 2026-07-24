@@ -1,3 +1,8 @@
+const mobileHeroStyles = document.createElement('link');
+mobileHeroStyles.rel = 'stylesheet';
+mobileHeroStyles.href = 'mobile-hero.css';
+document.head.appendChild(mobileHeroStyles);
+
 const config = window.LXE_CONFIG || {};
 
 const menuButton = document.querySelector('.menu-button');
