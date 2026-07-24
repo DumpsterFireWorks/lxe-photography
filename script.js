@@ -63,15 +63,65 @@ if (config.bookingUrl && socialContainer) {
   socialContainer.appendChild(bookingLink);
 }
 
+const availabilityGrid = document.querySelector('#availability-grid');
+const availabilityEmpty = document.querySelector('#availability-empty');
+const preferredDate = document.querySelector('#preferred-date');
+const preferredTime = document.querySelector('#preferred-time');
+const availability = Array.isArray(config.availability) ? config.availability : [];
+
+if (availabilityGrid && availability.length) {
+  availability.forEach(day => {
+    const card = document.createElement('article');
+    card.className = 'availability-card reveal';
+
+    const heading = document.createElement('h3');
+    heading.textContent = day.date;
+    card.appendChild(heading);
+
+    const times = document.createElement('div');
+    times.className = 'time-grid';
+
+    (day.times || []).forEach(time => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'time-button';
+      button.textContent = time;
+      button.addEventListener('click', () => {
+        if (preferredDate) preferredDate.value = day.date;
+        if (preferredTime) preferredTime.value = time;
+        document.querySelectorAll('.time-button').forEach(item => item.classList.remove('selected'));
+        button.classList.add('selected');
+        document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+        window.setTimeout(() => preferredDate?.focus(), 550);
+      });
+      times.appendChild(button);
+    });
+
+    card.appendChild(times);
+    availabilityGrid.appendChild(card);
+    observer.observe(card);
+  });
+} else if (availabilityEmpty) {
+  availabilityEmpty.hidden = false;
+}
+
 const contactForm = document.querySelector('#contact-form');
 const formStatus = document.querySelector('.form-status');
 contactForm?.addEventListener('submit', event => {
   event.preventDefault();
   const data = new FormData(contactForm);
-  const subject = encodeURIComponent(`LXE Photography inquiry — ${data.get('session')}`);
-  const body = encodeURIComponent(`Name: ${data.get('name')}\nEmail: ${data.get('email')}\nSession: ${data.get('session')}\n\n${data.get('message')}`);
+  const subject = encodeURIComponent(`LXE Photography booking request — ${data.get('session')}`);
+  const body = encodeURIComponent(
+    `Name: ${data.get('name')}\n` +
+    `Email: ${data.get('email')}\n` +
+    `Phone: ${data.get('phone') || 'Not provided'}\n` +
+    `Session: ${data.get('session')}\n` +
+    `Preferred date: ${data.get('date') || 'Flexible'}\n` +
+    `Preferred time: ${data.get('time') || 'Flexible'}\n\n` +
+    `${data.get('message')}`
+  );
   window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-  if (formStatus) formStatus.textContent = 'Your email app should open with the inquiry ready to send.';
+  if (formStatus) formStatus.textContent = 'Your email app should open with the booking request ready to send. The spot is held only after Lexus confirms it.';
 });
 
 document.querySelector('#year').textContent = new Date().getFullYear();
