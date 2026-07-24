@@ -31,6 +31,7 @@
       <a href="#about">About</a>
       <a href="#portfolio">Portfolio</a>
       <a href="#services">Services</a>
+      <a href="#availability">Open spots</a>
       <a href="#investment">Investment</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -46,7 +47,10 @@
         <p class="eyebrow light">Muskegon, Michigan</p>
         <h1>Capturing <em>the moments</em><br />that matter</h1>
         <p>Natural. Timeless. You.</p>
-        <a class="button button-light" href="#portfolio">View portfolio</a>
+        <div class="hero-actions">
+          <a class="button button-light" href="#portfolio">View portfolio</a>
+          <a class="button button-outline-light" href="#availability">See open spots</a>
+        </div>
       </div>
     </section>
 
@@ -82,7 +86,6 @@
         <figure class="portfolio-item photo-placeholder alt-4" data-category="senior"><figcaption>Milestones</figcaption></figure>
         <figure class="portfolio-item photo-placeholder alt-5" data-category="lifestyle"><figcaption>Stories</figcaption></figure>
       </div>
-      <p class="portfolio-note">Portfolio photographs are ready to be added in <code>assets/images</code>.</p>
     </section>
 
     <section id="about" class="about section-anchor section-pad">
@@ -96,14 +99,24 @@
       </div>
     </section>
 
-    <section id="investment" class="investment section-anchor section-pad muted-section">
+    <section id="availability" class="availability section-anchor section-pad muted-section">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Now booking</p>
+        <h2>choose an open spot</h2>
+        <p class="section-intro">Tap a time to add it to the booking form. Your session is not reserved until Lexus confirms it.</p>
+      </div>
+      <div id="availability-grid" class="availability-grid" aria-live="polite"></div>
+      <div class="availability-empty" id="availability-empty" hidden>No open spots are listed right now. Send an inquiry and Lexus will help find a date.</div>
+    </section>
+
+    <section id="investment" class="investment section-anchor section-pad">
       <div class="section-heading reveal">
         <p class="eyebrow">Investment</p>
         <h2>simple sessions, meaningful photographs</h2>
         <p class="section-intro">Packages can be finalized as Lexus establishes her session lengths, image counts, and launch pricing.</p>
       </div>
       <div class="price-grid">
-        <article class="price-card reveal"><p class="eyebrow">Starting package</p><h3>Portrait Session</h3><p>Perfect for seniors, couples, personal portraits, and lifestyle sessions.</p><ul><li>Planning guidance</li><li>Outdoor location</li><li>Edited digital gallery</li><li>Print release</li></ul><a class="button" href="#contact">Ask about availability</a></article>
+        <article class="price-card reveal"><p class="eyebrow">Starting package</p><h3>Portrait Session</h3><p>Perfect for seniors, couples, personal portraits, and lifestyle sessions.</p><ul><li>Planning guidance</li><li>Outdoor location</li><li>Edited digital gallery</li><li>Print release</li></ul><a class="button" href="#availability">Check open spots</a></article>
         <article class="price-card featured reveal"><p class="eyebrow">Coming soon</p><h3>Custom Collections</h3><p>Expanded packages for families, events, branding, and longer storytelling sessions.</p><ul><li>Flexible coverage</li><li>Multiple locations</li><li>Expanded galleries</li><li>Custom planning</li></ul><a class="button button-dark" href="#contact">Plan a session</a></article>
       </div>
     </section>
@@ -122,17 +135,22 @@
       <form class="contact-form reveal" id="contact-form">
         <label>Name<input name="name" required autocomplete="name" /></label>
         <label>Email<input name="email" type="email" required autocomplete="email" /></label>
+        <label>Phone<input name="phone" type="tel" autocomplete="tel" inputmode="tel" /></label>
         <label>Session type<select name="session"><option>Portrait</option><option>Senior</option><option>Couples</option><option>Family</option><option>Lifestyle</option><option>Other</option></select></label>
+        <label>Preferred date<input id="preferred-date" name="date" autocomplete="off" placeholder="Choose an open spot above or enter a date" /></label>
+        <label>Preferred time<input id="preferred-time" name="time" autocomplete="off" placeholder="Example: 4:30 PM" /></label>
         <label>Message<textarea name="message" rows="6" required></textarea></label>
-        <button class="button button-dark" type="submit">Send inquiry</button>
+        <button class="button button-dark" type="submit">Request this session</button>
         <p class="form-status" role="status"></p>
       </form>
     </section>
   </main>
 
+  <a class="mobile-book-button" href="#availability">View open spots</a>
+
   <footer class="site-footer">
     <div class="footer-brand"><span class="brand-mark">LXE</span><span class="brand-sub">PHOTOGRAPHY</span><small>by Lexus Erickson</small></div>
-    <nav aria-label="Footer navigation"><a href="#about">About</a><a href="#portfolio">Portfolio</a><a href="#services">Services</a><a href="#contact">Contact</a></nav>
+    <nav aria-label="Footer navigation"><a href="#about">About</a><a href="#portfolio">Portfolio</a><a href="#availability">Open spots</a><a href="#contact">Contact</a></nav>
     <p>© <span id="year"></span> LXE Photography. All rights reserved.</p>
   </footer>
 </body>
