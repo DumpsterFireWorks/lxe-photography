@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lxephotography.com/sitemap.xml
