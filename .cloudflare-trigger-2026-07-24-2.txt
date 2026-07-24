@@ -1,1 +1,2 @@
 Cloudflare rebuild trigger after GitHub App repository access was updated on 2026-07-24.
+GitHub App access to kool1160/lxe-photography confirmed; trigger production build.
