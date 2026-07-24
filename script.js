@@ -1,5 +1,4 @@
-['mobile-hero.css', 'social-icons.css'].forEach(href => {
-  if (document.querySelector(`link[href="${href}"]`)) return;
+['mobile-hero.css?v=20260724-4', 'social-icons.css?v=20260724-4'].forEach(href => {
   const stylesheet = document.createElement('link');
   stylesheet.rel = 'stylesheet';
   stylesheet.href = href;
