@@ -20,6 +20,15 @@
 /social-icons.css
   Cache-Control: no-cache, max-age=0, must-revalidate
 
+/pricing.css
+  Cache-Control: no-cache, max-age=0, must-revalidate
+
+/payment.css
+  Cache-Control: no-cache, max-age=0, must-revalidate
+
+/editorial-upgrade.css
+  Cache-Control: no-cache, max-age=0, must-revalidate
+
 /script.js
   Cache-Control: no-cache, max-age=0, must-revalidate
 
