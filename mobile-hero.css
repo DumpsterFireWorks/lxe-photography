@@ -83,6 +83,10 @@
 }
 
 @media (max-width: 620px) {
+  body {
+    padding-bottom: 0;
+  }
+
   .hero {
     min-height: calc(100svh - 118px);
   }
@@ -113,5 +117,9 @@
 
   .hero-visual img {
     object-position: 50% 16%;
+  }
+
+  .mobile-book-button {
+    display: none !important;
   }
 }
