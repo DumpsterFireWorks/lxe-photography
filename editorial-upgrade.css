@@ -1,0 +1,281 @@
+/* Editorial refinement layer: keeps the honest beginner positioning while making the site feel calmer and more premium. */
+.announcement {
+  background: #2f3327;
+  letter-spacing: .16em;
+}
+
+.hero-copy {
+  max-width: 760px;
+}
+
+.hero-note {
+  max-width: 500px;
+}
+
+.brand-statement {
+  padding-block: clamp(4rem, 7vw, 7rem);
+}
+
+.brand-statement p {
+  max-width: 920px;
+}
+
+.pricing-section {
+  background: #f7f2e9;
+}
+
+.pricing-intro {
+  max-width: 860px;
+  margin-bottom: 4rem;
+}
+
+.collection-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.collection-card {
+  min-height: 430px;
+  display: flex;
+  flex-direction: column;
+  padding: 2.35rem 2rem;
+  background: rgba(255, 253, 249, .58);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.collection-card .collection-number {
+  color: var(--olive);
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.15rem;
+}
+
+.collection-card h3 {
+  margin: 1.8rem 0 .35rem;
+  font-size: clamp(2rem, 2.8vw, 2.8rem);
+}
+
+.collection-card .price {
+  margin-bottom: 1.5rem;
+}
+
+.collection-card ul {
+  margin: 0;
+  padding-left: 1.05rem;
+  color: var(--muted);
+}
+
+.collection-card li {
+  margin-bottom: .5rem;
+}
+
+.collection-card .price-note {
+  margin-top: auto;
+}
+
+.launch-special {
+  max-width: 1180px;
+  margin: 1.2rem auto 0;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--olive);
+  box-shadow: inset 0 4px 0 var(--olive);
+}
+
+.launch-special .eyebrow,
+.launch-special p {
+  color: var(--muted);
+}
+
+.launch-price strong {
+  color: var(--olive-dark);
+}
+
+.more-sessions {
+  max-width: 1180px;
+  margin: 1.2rem auto 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.more-sessions > summary {
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  list-style: none;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: .68rem;
+  font-weight: 600;
+}
+
+.more-sessions > summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-sessions > summary::after {
+  content: "+";
+  color: var(--olive);
+  font-family: "Cormorant Garamond", serif;
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.more-sessions[open] > summary::after {
+  content: "–";
+}
+
+.more-session-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0 0 1.2rem;
+}
+
+.more-session-card {
+  padding: 1.7rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+}
+
+.more-session-card h3 {
+  margin-bottom: .25rem;
+  font-size: 1.75rem;
+}
+
+.more-session-card .price {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.more-session-card ul {
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--muted);
+}
+
+.more-session-card li {
+  margin-bottom: .4rem;
+}
+
+.pricing-details {
+  margin-top: 1.2rem;
+}
+
+.policy-card {
+  background: rgba(255, 253, 249, .55);
+}
+
+.confirmed-payment {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.confirmed-payment summary {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style: none;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+  font-size: .61rem;
+  font-weight: 600;
+}
+
+.confirmed-payment summary::-webkit-details-marker {
+  display: none;
+}
+
+.confirmed-payment summary::after {
+  content: "+";
+  color: var(--olive);
+  font-size: 1.25rem;
+}
+
+.confirmed-payment[open] summary::after {
+  content: "–";
+}
+
+.confirmed-payment .retainer-payment {
+  margin: 0 0 1rem;
+  padding: 1rem 0 0;
+  background: transparent;
+  border: 0;
+}
+
+.confirmed-payment .cash-app-button {
+  min-height: 58px;
+  background: transparent;
+  color: var(--olive-dark);
+  border: 1px solid var(--olive-dark);
+}
+
+.confirmed-payment .cash-app-button:hover,
+.confirmed-payment .cash-app-button:focus-visible {
+  background: var(--olive-dark);
+  color: white;
+  filter: none;
+}
+
+.confirmed-payment .cash-app-mark {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+  border-radius: 0;
+  background: var(--olive-dark);
+  font-size: 1.35rem;
+}
+
+.confirmed-payment .cash-app-button:hover .cash-app-mark,
+.confirmed-payment .cash-app-button:focus-visible .cash-app-mark {
+  background: white;
+  color: var(--olive-dark);
+}
+
+.offer-banner {
+  background: #2f3327;
+}
+
+@media (max-width: 1050px) {
+  .collection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .more-session-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .collection-grid,
+  .more-session-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .collection-card {
+    min-height: 0;
+    padding: 1.7rem 1.4rem;
+  }
+
+  .collection-card h3 {
+    margin-top: 1.15rem;
+  }
+
+  .launch-special {
+    margin-top: 1rem;
+  }
+
+  .more-sessions > summary {
+    min-height: 72px;
+  }
+}
