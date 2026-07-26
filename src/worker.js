@@ -1,5 +1,6 @@
-const EMAIL_TO = "hello@lxephotography.com";
-const EMAIL_FROM = "website@lxephotography.com";
+const INQUIRY_DESTINATION = "lynnlexus421@gmail.com";
+const PUBLIC_EMAIL = "hello@lxephotography.com";
+const EMAIL_FROM = "hello@lxephotography.com";
 
 const HERO_POLISH_STYLE = `
 <style id="hero-readability-patch">
@@ -22,10 +23,10 @@ const HERO_POLISH_STYLE = `
   }
 </style>`;
 
-const PAYMENT_ASSETS = `
-<link rel="stylesheet" href="/payment-ready.css?v=20260726-2">
-<link rel="stylesheet" href="/portfolio-additions.css?v=20260726-2">
-<script defer src="/payment-ready.js?v=20260726-2"></script>`;
+const PAGE_ASSETS = `
+<link rel="stylesheet" href="/payment-ready.css?v=20260726-3">
+<link rel="stylesheet" href="/portfolio-additions.css?v=20260726-3">
+<script defer src="/payment-ready.js?v=20260726-3"></script>`;
 
 const ENGAGEMENT_STORY_HTML = `
 <div class="portfolio-new-story reveal visible" aria-label="More from this Lake Michigan engagement story">
@@ -78,7 +79,7 @@ function buildMailto(data) {
     ].join("\n")
   );
 
-  return `mailto:${EMAIL_TO}?subject=${subject}&body=${body}`;
+  return `mailto:${PUBLIC_EMAIL}?subject=${subject}&body=${body}`;
 }
 
 function validate(data) {
@@ -184,7 +185,7 @@ async function handleInquiry(request, env) {
 
   try {
     await env.EMAIL.send({
-      to: EMAIL_TO,
+      to: INQUIRY_DESTINATION,
       from: { email: EMAIL_FROM, name: "LXE Photography Website" },
       replyTo: { email: data.email, name: data.name },
       subject: `New inquiry — ${data.session}`,
@@ -224,7 +225,7 @@ async function polishHomepage(response, url) {
     );
   }
 
-  const additions = `${HERO_POLISH_STYLE}\n${PAYMENT_ASSETS}`;
+  const additions = `${HERO_POLISH_STYLE}\n${PAGE_ASSETS}`;
   const polishedHtml = html.replace("</head>", `${additions}\n</head>`);
   const headers = new Headers(response.headers);
   headers.delete("Content-Length");
