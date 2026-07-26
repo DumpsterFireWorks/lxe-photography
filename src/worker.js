@@ -23,10 +23,21 @@ const HERO_POLISH_STYLE = `
 </style>`;
 
 const PAYMENT_ASSETS = `
-<link rel="stylesheet" href="/payment-ready.css?v=20260726-1">
-<link rel="stylesheet" href="/portfolio-additions.css?v=20260726-1">
-<script defer src="/payment-ready.js?v=20260726-1"></script>
-<script defer src="/portfolio-additions.js?v=20260726-1"></script>`;
+<link rel="stylesheet" href="/payment-ready.css?v=20260726-2">
+<link rel="stylesheet" href="/portfolio-additions.css?v=20260726-2">
+<script defer src="/payment-ready.js?v=20260726-2"></script>`;
+
+const ENGAGEMENT_STORY_HTML = `
+<div class="portfolio-new-story reveal visible" aria-label="More from this Lake Michigan engagement story">
+  <figure>
+    <img src="/public/images/portfolio/0395519F-D071-4C9D-BB0C-8AD5A4B259C4.png" alt="Family and engagement story photographed along the Lake Michigan shoreline" loading="lazy" decoding="async" />
+    <figcaption><span>Family &amp; engagement</span><span>Lake Michigan</span></figcaption>
+  </figure>
+  <figure>
+    <img src="/public/images/portfolio/IMG_8719.jpeg" alt="Engagement ring reveal photographed along the Lake Michigan shoreline" loading="lazy" decoding="async" />
+    <figcaption><span>A joyful yes</span><span>Shoreline</span></figcaption>
+  </figure>
+</div>`;
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -200,12 +211,24 @@ async function polishHomepage(response, url) {
     return response;
   }
 
-  const html = await response.text();
+  let html = await response.text();
+  html = html.replace(
+    "One family, one shoreline, and the honest pieces of a session that cannot be forced.",
+    "One family, one engagement, one shoreline, and the honest pieces of a session that cannot be forced."
+  );
+
+  if (!html.includes('class="portfolio-new-story')) {
+    html = html.replace(
+      '<div class="portfolio-closing reveal">',
+      `${ENGAGEMENT_STORY_HTML}\n\n      <div class="portfolio-closing reveal">`
+    );
+  }
+
   const additions = `${HERO_POLISH_STYLE}\n${PAYMENT_ASSETS}`;
   const polishedHtml = html.replace("</head>", `${additions}\n</head>`);
   const headers = new Headers(response.headers);
   headers.delete("Content-Length");
-  headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate");
+  headers.set("Cache-Control", "no-store, max-age=0");
 
   return new Response(polishedHtml, {
     status: response.status,
