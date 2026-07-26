@@ -22,6 +22,10 @@ const HERO_POLISH_STYLE = `
   }
 </style>`;
 
+const PAYMENT_ASSETS = `
+<link rel="stylesheet" href="/payment-ready.css?v=20260726-1">
+<script defer src="/payment-ready.js?v=20260726-1"></script>`;
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -195,9 +199,8 @@ async function polishHomepage(response, url) {
   }
 
   const html = await response.text();
-  if (html.includes('id="hero-readability-patch"')) return response;
-
-  const polishedHtml = html.replace("</head>", `${HERO_POLISH_STYLE}\n</head>`);
+  const additions = `${HERO_POLISH_STYLE}\n${PAYMENT_ASSETS}`;
+  const polishedHtml = html.replace("</head>", `${additions}\n</head>`);
   const headers = new Headers(response.headers);
   headers.delete("Content-Length");
   headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate");

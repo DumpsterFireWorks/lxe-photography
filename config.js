@@ -4,6 +4,12 @@ window.LXE_CONFIG = {
   location: "Muskegon, Michigan",
   email: "hello@lxephotography.com",
   inquiryEndpoint: "/api/inquiry",
+  payments: {
+    squareRetainerUrl: "",
+    cashAppUrl: "https://cash.app/$lexuslynnh",
+    cashAppHandle: "$lexuslynnh",
+    cashAppAccountName: "Lexus Hilton"
+  },
   socials: {
     instagram: "",
     facebook: "",
