@@ -11,6 +11,40 @@ siteNav?.querySelectorAll('a').forEach(link => link.addEventListener('click', ()
   menuButton?.setAttribute('aria-expanded', 'false');
 }));
 
+const portfolioStyles = document.createElement('link');
+portfolioStyles.rel = 'stylesheet';
+portfolioStyles.href = 'portfolio-gallery.css?v=20260726-1';
+document.head.appendChild(portfolioStyles);
+
+const currentPortfolio = document.querySelector('#portfolio');
+if (currentPortfolio) {
+  currentPortfolio.outerHTML = `
+    <section id="portfolio" class="client-portfolio section-anchor section-pad">
+      <div class="portfolio-heading reveal">
+        <p class="eyebrow">Selected work</p>
+        <h2>Connection, movement,<br /><em>and the moments between.</em></h2>
+        <p>A first look at the families and couples Lexus is photographing as LXE Photography grows across West Michigan.</p>
+      </div>
+
+      <div class="client-portfolio-grid" aria-label="LXE Photography portfolio">
+        <figure class="reveal"><img src="/public/images/portfolio/family-beach-lift.jpg" alt="Family laughing together at the Lake Michigan shoreline" loading="lazy" decoding="async" /><figcaption><span>Family</span><span>Lake Michigan</span></figcaption></figure>
+        <figure class="reveal"><img src="/public/images/portfolio/couples-beach-hands-detail.jpg" alt="Couple holding hands by the water with a ring visible" loading="lazy" decoding="async" /><figcaption><span>Details</span><span>Beach session</span></figcaption></figure>
+        <figure class="reveal"><img src="/public/images/portfolio/couples-beach-seated.jpg" alt="Couple seated together among beach grass and sand dunes" loading="lazy" decoding="async" /><figcaption><span>Couples</span><span>Dunes</span></figcaption></figure>
+        <figure class="reveal"><img src="/public/images/portfolio/couples-beach-kiss.jpg" alt="Playful couple sharing a quiet moment in the beach grass" loading="lazy" decoding="async" /><figcaption><span>Connection</span><span>Natural direction</span></figcaption></figure>
+        <figure class="reveal"><img src="/public/images/portfolio/family-beach-candid.jpg" alt="Family relaxing and laughing together in the sand dunes" loading="lazy" decoding="async" /><figcaption><span>Family story</span><span>Candid</span></figcaption></figure>
+        <figure class="reveal"><img src="/public/images/portfolio/couples-beach-shore-kiss.jpg" alt="Couple kissing beside the Lake Michigan shoreline" loading="lazy" decoding="async" /><figcaption><span>Couples</span><span>Shoreline</span></figcaption></figure>
+        <figure class="reveal"><img src="/public/images/portfolio/couples-beach-embrace-close.jpg" alt="Close portrait of a couple embracing outdoors" loading="lazy" decoding="async" /><figcaption><span>Portrait</span><span>Close connection</span></figcaption></figure>
+        <figure class="reveal"><img src="/public/images/portfolio/couples-beach-embrace-detail.jpg" alt="Close detail of a couple embracing with hands and ring visible" loading="lazy" decoding="async" /><figcaption><span>Details</span><span>Storytelling</span></figcaption></figure>
+        <figure class="reveal"><img src="/public/images/portfolio/couples-field-embrace.jpg" alt="Couple smiling together in a grassy field" loading="lazy" decoding="async" /><figcaption><span>Couples</span><span>Field portrait</span></figcaption></figure>
+      </div>
+
+      <div class="portfolio-closing reveal">
+        <p>Every session is guided gently, with room for real expressions, movement, and the pieces of your story that cannot be forced.</p>
+        <a class="button button-dark" href="#contact">Inquire about a session</a>
+      </div>
+    </section>`;
+}
+
 document.querySelectorAll('.filter').forEach(button => {
   button.addEventListener('click', () => {
     document.querySelectorAll('.filter').forEach(item => item.classList.remove('active'));
