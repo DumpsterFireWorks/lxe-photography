@@ -8,3 +8,10 @@ public/images/**/README.md
 portfolio-update-note*.txt
 portfolio-update-test.txt
 public/portfolio-data/
+styles.css
+mobile-hero.css
+social-icons.css
+pricing.css
+payment.css
+editorial-upgrade.css
+portfolio-gallery.css
