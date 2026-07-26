@@ -12,7 +12,7 @@ window.LXE_CONFIG = {
   },
   socials: {
     instagram: "",
-    facebook: "",
+    facebook: "https://www.facebook.com/LXEPhotography/",
     tiktok: ""
   }
 };
