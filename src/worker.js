@@ -1,6 +1,27 @@
 const EMAIL_TO = "hello@lxephotography.com";
 const EMAIL_FROM = "website@lxephotography.com";
 
+const HERO_POLISH_STYLE = `
+<style id="hero-readability-patch">
+  .hero-note { color: rgba(255, 255, 255, 0.86); }
+  .hero-copy h1,
+  .hero-copy .hero-lede,
+  .hero-copy .eyebrow,
+  .hero-copy .hero-note,
+  .hero-copy .light-link {
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.58), 0 1px 2px rgba(0, 0, 0, 0.35);
+  }
+
+  @media (max-width: 620px) {
+    .hero-image { object-position: 48% center !important; }
+    .hero-overlay {
+      background:
+        linear-gradient(90deg, rgba(17, 19, 14, 0.74) 0%, rgba(17, 19, 14, 0.48) 48%, rgba(17, 19, 14, 0.14) 100%),
+        linear-gradient(180deg, rgba(17, 19, 14, 0.06) 0%, rgba(17, 19, 14, 0.20) 30%, rgba(17, 19, 14, 0.72) 67%, rgba(17, 19, 14, 0.95) 100%) !important;
+    }
+  }
+</style>`;
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -165,6 +186,29 @@ async function handleInquiry(request, env) {
   }
 }
 
+async function polishHomepage(response, url) {
+  const isHomepage = url.pathname === "/" || url.pathname === "/index.html";
+  const contentType = response.headers.get("Content-Type") || "";
+
+  if (!isHomepage || !contentType.includes("text/html") || !response.ok) {
+    return response;
+  }
+
+  const html = await response.text();
+  if (html.includes('id="hero-readability-patch"')) return response;
+
+  const polishedHtml = html.replace("</head>", `${HERO_POLISH_STYLE}\n</head>`);
+  const headers = new Headers(response.headers);
+  headers.delete("Content-Length");
+  headers.set("Cache-Control", "no-cache, max-age=0, must-revalidate");
+
+  return new Response(polishedHtml, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -173,6 +217,7 @@ export default {
       return handleInquiry(request, env);
     }
 
-    return env.ASSETS.fetch(request);
+    const response = await env.ASSETS.fetch(request);
+    return polishHomepage(response, url);
   }
 };
