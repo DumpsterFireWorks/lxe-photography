@@ -1,7 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "lxe-photography",
-  "compatibility_date": "2026-07-24",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-07-26",
   "workers_dev": true,
   "routes": [
     {
@@ -15,7 +16,20 @@
   ],
   "assets": {
     "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
     "html_handling": "auto-trailing-slash",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "404-page"
   }
+
+  // To enable direct website inquiry delivery after onboarding
+  // lxephotography.com in Cloudflare Email Service, add:
+  //
+  // "send_email": [
+  //   {
+  //     "name": "EMAIL",
+  //     "destination_address": "hello@lxephotography.com",
+  //     "allowed_sender_addresses": ["website@lxephotography.com"]
+  //   }
+  // ]
 }
