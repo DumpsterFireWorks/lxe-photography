@@ -24,7 +24,9 @@ const HERO_POLISH_STYLE = `
 
 const PAYMENT_ASSETS = `
 <link rel="stylesheet" href="/payment-ready.css?v=20260726-1">
-<script defer src="/payment-ready.js?v=20260726-1"></script>`;
+<link rel="stylesheet" href="/portfolio-additions.css?v=20260726-1">
+<script defer src="/payment-ready.js?v=20260726-1"></script>
+<script defer src="/portfolio-additions.js?v=20260726-1"></script>`;
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
