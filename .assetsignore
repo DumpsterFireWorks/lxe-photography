@@ -2,7 +2,9 @@ node_modules/
 .git/
 .github/
 package-lock.json
-package.json
-wrangler.jsonc
 README.md
+src/
 public/images/**/README.md
+portfolio-update-note*.txt
+portfolio-update-test.txt
+public/portfolio-data/
