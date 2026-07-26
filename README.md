@@ -1,88 +1,55 @@
 # LXE Photography
 
-Official website repository for **LXE Photography by Lexus Erickson**.
+Production website for **LXE Photography by Lexus Erickson**.
 
-## Current site
+## Architecture
 
-The first responsive website foundation includes:
+- Cloudflare Worker with static assets
+- Static editorial homepage
+- Accessible mobile navigation
+- Curated client portfolio
+- Session collections and booking policy summary
+- Inquiry API with a safe email-app fallback
+- Privacy and booking-policy pages
+- Security and caching headers
 
-- Home, About, Portfolio, Services, Investment, and Contact sections
-- Desktop and mobile navigation
-- Editable social, email, booking, and location settings
-- Filterable portfolio layout
-- Email-based inquiry form
-- Cloudflare Pages-compatible static hosting
-- Baseline security headers
-- Accessible semantic markup and reduced JavaScript dependencies
+## Business configuration
 
-## Update business details and social links
+Edit `config.js` to change the public email, location, inquiry endpoint, or social URLs. Empty social URLs stay hidden.
 
-Edit `config.js`:
+## Portfolio images
 
-```js
-window.LXE_CONFIG = {
-  businessName: "LXE Photography",
-  photographer: "Lexus Erickson",
-  location: "Muskegon, Michigan",
-  email: "hello@lxephotography.com",
-  phone: "",
-  bookingUrl: "",
-  socials: {
-    instagram: "",
-    facebook: "",
-    tiktok: "",
-    pinterest: ""
-  }
-};
-```
+Client work currently lives in:
 
-Paste the complete `https://` URL for each social profile. Empty entries remain hidden.
+`public/images/portfolio/`
 
-## Add portfolio photos
+Use optimized JPEG, WebP, or AVIF files. Keep descriptive filenames, useful alt text, and explicit layout classes in `index.html`.
 
-1. Create `assets/images/`.
-2. Upload optimized `.webp` photographs.
-3. Replace the temporary `.photo-placeholder` blocks in `index.html` with images, for example:
+## Inquiry delivery
 
-```html
-<figure class="portfolio-item" data-category="portrait">
-  <img src="assets/images/portrait-01.webp" alt="Natural-light senior portrait in a field" loading="lazy" />
-  <figcaption>Portraits</figcaption>
-</figure>
-```
+The form posts to `/api/inquiry`.
 
-Recommended export settings:
+`src/worker.js` is ready to send through Cloudflare Email Service when the `EMAIL` binding is enabled. Until then, the API returns a safe `mailto:` fallback so the visitor can review and send the inquiry from their email application.
 
-- WebP format
-- 1600–2200 pixels on the long edge
-- 75–85 quality
-- Descriptive filenames and alt text
+To activate direct delivery:
 
-## Cloudflare Pages deployment
+1. Onboard `lxephotography.com` under Cloudflare **Email Service → Email Sending**.
+2. Confirm that `hello@lxephotography.com` reaches Lexus.
+3. Add the documented `send_email` binding in `wrangler.jsonc`.
+4. Deploy and submit a real end-to-end test inquiry.
 
-1. In Cloudflare, open **Workers & Pages**.
-2. Select **Create application → Pages → Connect to Git**.
-3. Choose `kool1160/lxe-photography`.
-4. Production branch: `main`.
-5. Framework preset: `None`.
-6. Build command: leave blank.
-7. Build output directory: `/`.
-8. Deploy.
-
-Cloudflare will create a free `pages.dev` address. A custom domain can be connected afterward from the Pages project under **Custom domains**.
-
-## Local preview
-
-Because the site is static, open `index.html` directly or run:
+## Development
 
 ```bash
-python -m http.server 8080
+npm install
+npm run check
+npm run preview
 ```
 
-Then visit `http://localhost:8080`.
+## Deployment
 
-## Branch workflow
+```bash
+npm run deploy
+```
 
-- `main` is the production branch.
-- Build changes on feature branches.
-- Review through pull requests before merging.
+Production branch: `main`
