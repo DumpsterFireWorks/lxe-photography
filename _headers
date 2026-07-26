@@ -2,38 +2,41 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  X-Frame-Options: SAMEORIGIN
-  Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'self'
+  X-Frame-Options: DENY
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests
 
 /
-  Cache-Control: no-store, max-age=0
+  Cache-Control: no-cache, max-age=0, must-revalidate
 
 /index.html
-  Cache-Control: no-store, max-age=0
-
-/styles.css
   Cache-Control: no-cache, max-age=0, must-revalidate
 
-/mobile-hero.css
+/privacy.html
   Cache-Control: no-cache, max-age=0, must-revalidate
 
-/social-icons.css
+/policies.html
   Cache-Control: no-cache, max-age=0, must-revalidate
 
-/pricing.css
+/404.html
   Cache-Control: no-cache, max-age=0, must-revalidate
 
-/payment.css
-  Cache-Control: no-cache, max-age=0, must-revalidate
-
-/editorial-upgrade.css
-  Cache-Control: no-cache, max-age=0, must-revalidate
+/site.css
+  Cache-Control: public, max-age=31536000, immutable
 
 /script.js
-  Cache-Control: no-cache, max-age=0, must-revalidate
+  Cache-Control: public, max-age=31536000, immutable
 
 /config.js
-  Cache-Control: no-cache, max-age=0, must-revalidate
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/favicon.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+/site.webmanifest
+  Cache-Control: public, max-age=86400
 
 /public/images/*
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+  Cache-Control: public, max-age=31536000, immutable
