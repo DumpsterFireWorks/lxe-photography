@@ -24,9 +24,9 @@ const HERO_POLISH_STYLE = `
 </style>`;
 
 const PAGE_ASSETS = `
-<link rel="stylesheet" href="/payment-ready.css?v=20260726-3">
-<link rel="stylesheet" href="/portfolio-additions.css?v=20260726-3">
-<script defer src="/payment-ready.js?v=20260726-3"></script>`;
+<link rel="stylesheet" href="/payment-ready.css?v=20260727-1">
+<link rel="stylesheet" href="/portfolio-additions.css?v=20260727-1">
+<script defer src="/payment-ready.js?v=20260727-1"></script>`;
 
 const ENGAGEMENT_STORY_HTML = `
 <div class="portfolio-new-story reveal visible" aria-label="More from this Lake Michigan engagement story">
