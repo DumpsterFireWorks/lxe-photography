@@ -48,8 +48,218 @@
   margin-top: 0.8rem;
 }
 
+.saturday-mini-special {
+  max-width: 1240px;
+  margin: 1.2rem auto 4.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  background: #20231b;
+  color: #fffdf7;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(31, 31, 23, 0.18);
+}
+
+.saturday-mini-visual {
+  position: relative;
+  min-height: 680px;
+  background: #cfc4b6;
+}
+
+.saturday-mini-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(16, 18, 13, 0.02), rgba(16, 18, 13, 0.22));
+  pointer-events: none;
+}
+
+.saturday-mini-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.saturday-mini-badge {
+  position: absolute;
+  z-index: 2;
+  top: 1.3rem;
+  left: 1.3rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(255, 253, 247, 0.92);
+  color: #20231b;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.58rem;
+  font-weight: 700;
+}
+
+.saturday-mini-copy {
+  padding: clamp(2rem, 5vw, 4.75rem);
+  align-self: center;
+}
+
+.saturday-mini-copy .eyebrow {
+  color: #d9c698;
+}
+
+.saturday-mini-copy h2 {
+  margin: 0.5rem 0 1rem;
+  color: #fffdf7;
+  font-size: clamp(2.7rem, 5vw, 5.2rem);
+  line-height: 0.92;
+}
+
+.saturday-mini-copy h2 em {
+  color: #d9c698;
+}
+
+.saturday-mini-date {
+  margin: 0 0 1.4rem;
+  color: rgba(255, 253, 247, 0.82);
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.saturday-mini-copy > p:not(.eyebrow):not(.saturday-mini-date):not(.saturday-slot-label):not(.saturday-slot-status):not(.saturday-mini-note) {
+  color: rgba(255, 253, 247, 0.78);
+  line-height: 1.7;
+}
+
+.saturday-mini-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.saturday-mini-facts div {
+  padding: 1rem 0.8rem;
+  border: 1px solid rgba(255, 253, 247, 0.18);
+  text-align: center;
+}
+
+.saturday-mini-facts strong,
+.saturday-mini-facts span {
+  display: block;
+}
+
+.saturday-mini-facts strong {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.saturday-mini-facts span {
+  margin-top: 0.4rem;
+  color: rgba(255, 253, 247, 0.62);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.55rem;
+  font-weight: 600;
+}
+
+.saturday-slot-label {
+  margin: 1.6rem 0 0.8rem;
+  color: #fffdf7;
+  font-weight: 600;
+}
+
+.saturday-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.saturday-slot {
+  min-height: 44px;
+  padding: 0.65rem 0.5rem;
+  border: 1px solid rgba(255, 253, 247, 0.24);
+  background: transparent;
+  color: #fffdf7;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.saturday-slot:hover,
+.saturday-slot:focus-visible,
+.saturday-slot.selected {
+  border-color: #d9c698;
+  background: #d9c698;
+  color: #20231b;
+  transform: translateY(-1px);
+}
+
+.saturday-slot:focus-visible {
+  outline: 2px solid #fffdf7;
+  outline-offset: 2px;
+}
+
+.saturday-slot-status {
+  min-height: 1.35rem;
+  margin: 0.8rem 0 0;
+  color: #d9c698;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.saturday-mini-note {
+  margin: 0.65rem 0 0;
+  color: rgba(255, 253, 247, 0.58);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .saturday-mini-special {
+    grid-template-columns: 1fr;
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .saturday-mini-visual {
+    min-height: 500px;
+  }
+}
+
 @media (max-width: 620px) {
   .secure-payment {
     padding: 1.1rem;
+  }
+
+  .saturday-mini-special {
+    margin-top: 0.8rem;
+    margin-bottom: 3rem;
+  }
+
+  .saturday-mini-visual {
+    min-height: 420px;
+  }
+
+  .saturday-mini-copy {
+    padding: 1.6rem 1.15rem 1.8rem;
+  }
+
+  .saturday-mini-facts {
+    gap: 0.45rem;
+  }
+
+  .saturday-mini-facts div {
+    padding: 0.8rem 0.35rem;
+  }
+
+  .saturday-mini-facts strong {
+    font-size: 1.55rem;
+  }
+
+  .saturday-slot-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
