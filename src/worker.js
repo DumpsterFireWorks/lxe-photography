@@ -2,56 +2,6 @@ const INQUIRY_DESTINATION = "lynnlexus421@gmail.com";
 const PUBLIC_EMAIL = "hello@lxephotography.com";
 const EMAIL_FROM = "hello@lxephotography.com";
 
-const HERO_POLISH_STYLE = `
-<style id="hero-readability-patch">
-  .hero-note { color: rgba(255, 255, 255, 0.86); }
-  .hero-copy h1,
-  .hero-copy .hero-lede,
-  .hero-copy .eyebrow,
-  .hero-copy .hero-note,
-  .hero-copy .light-link {
-    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.58), 0 1px 2px rgba(0, 0, 0, 0.35);
-  }
-
-  @media (max-width: 620px) {
-    .hero-image { object-position: 48% center !important; }
-    .hero-overlay {
-      background:
-        linear-gradient(90deg, rgba(17, 19, 14, 0.74) 0%, rgba(17, 19, 14, 0.48) 48%, rgba(17, 19, 14, 0.14) 100%),
-        linear-gradient(180deg, rgba(17, 19, 14, 0.06) 0%, rgba(17, 19, 14, 0.20) 30%, rgba(17, 19, 14, 0.72) 67%, rgba(17, 19, 14, 0.95) 100%) !important;
-    }
-  }
-</style>`;
-
-const PAGE_ASSETS = `
-<link rel="stylesheet" href="/payment-ready.css?v=20260728-1">
-<link rel="stylesheet" href="/portfolio-additions.css?v=20260728-1">
-<script defer src="/payment-ready.js?v=20260728-1"></script>`;
-
-const ENGAGEMENT_STORY_HTML = `
-<div class="portfolio-new-story reveal visible" aria-label="More from this Lake Michigan engagement story">
-  <figure>
-    <img src="/public/images/portfolio/0395519F-D071-4C9D-BB0C-8AD5A4B259C4.png" alt="Family and engagement story photographed along the Lake Michigan shoreline" loading="lazy" decoding="async" />
-    <figcaption><span>Family &amp; engagement</span><span>Lake Michigan</span></figcaption>
-  </figure>
-  <figure>
-    <img src="/public/images/portfolio/IMG_8719.jpeg" alt="Engagement ring reveal photographed along the Lake Michigan shoreline" loading="lazy" decoding="async" />
-    <figcaption><span>A joyful yes</span><span>Shoreline</span></figcaption>
-  </figure>
-</div>`;
-
-const MERCEDES_PORTRAIT_HTML = `
-<div class="portfolio-new-story portfolio-mercedes-story reveal visible" aria-label="Outdoor portrait story photographed by LXE Photography">
-  <figure>
-    <img src="/public/images/portfolio/mercedes-blue-dress-full.jpeg" alt="Mercedes in a blue dress photographed in front of a soft outdoor fabric backdrop among pine trees" loading="lazy" decoding="async" />
-    <figcaption><span>Portrait</span><span>Soft outdoor styling</span></figcaption>
-  </figure>
-  <figure>
-    <img src="/public/images/portfolio/mercedes-blue-dress-portrait.jpeg" alt="Close outdoor portrait of Mercedes in a blue dress with warm natural light" loading="lazy" decoding="async" />
-    <figcaption><span>Portrait</span><span>Natural light</span></figcaption>
-  </figure>
-</div>`;
-
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -216,47 +166,6 @@ async function handleInquiry(request, env) {
   }
 }
 
-async function polishHomepage(response, url) {
-  const isHomepage = url.pathname === "/" || url.pathname === "/index.html";
-  const contentType = response.headers.get("Content-Type") || "";
-
-  if (!isHomepage || !contentType.includes("text/html") || !response.ok) {
-    return response;
-  }
-
-  let html = await response.text();
-  html = html.replace(
-    "One family, one shoreline, and the honest pieces of a session that cannot be forced.",
-    "Families, engagements, and portraits—honest stories photographed with warmth and intention."
-  );
-
-  if (!html.includes('class="portfolio-new-story')) {
-    html = html.replace(
-      '<div class="portfolio-closing reveal">',
-      `${ENGAGEMENT_STORY_HTML}\n\n      <div class="portfolio-closing reveal">`
-    );
-  }
-
-  if (!html.includes('class="portfolio-new-story portfolio-mercedes-story')) {
-    html = html.replace(
-      '<div class="portfolio-closing reveal">',
-      `${MERCEDES_PORTRAIT_HTML}\n\n      <div class="portfolio-closing reveal">`
-    );
-  }
-
-  const additions = `${HERO_POLISH_STYLE}\n${PAGE_ASSETS}`;
-  const polishedHtml = html.replace("</head>", `${additions}\n</head>`);
-  const headers = new Headers(response.headers);
-  headers.delete("Content-Length");
-  headers.set("Cache-Control", "no-store, max-age=0");
-
-  return new Response(polishedHtml, {
-    status: response.status,
-    statusText: response.statusText,
-    headers
-  });
-}
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -265,7 +174,6 @@ export default {
       return handleInquiry(request, env);
     }
 
-    const response = await env.ASSETS.fetch(request);
-    return polishHomepage(response, url);
+    return env.ASSETS.fetch(request);
   }
 };
