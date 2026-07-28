@@ -24,9 +24,9 @@ const HERO_POLISH_STYLE = `
 </style>`;
 
 const PAGE_ASSETS = `
-<link rel="stylesheet" href="/payment-ready.css?v=20260727-1">
-<link rel="stylesheet" href="/portfolio-additions.css?v=20260727-1">
-<script defer src="/payment-ready.js?v=20260727-1"></script>`;
+<link rel="stylesheet" href="/payment-ready.css?v=20260728-1">
+<link rel="stylesheet" href="/portfolio-additions.css?v=20260728-1">
+<script defer src="/payment-ready.js?v=20260728-1"></script>`;
 
 const ENGAGEMENT_STORY_HTML = `
 <div class="portfolio-new-story reveal visible" aria-label="More from this Lake Michigan engagement story">
@@ -37,6 +37,18 @@ const ENGAGEMENT_STORY_HTML = `
   <figure>
     <img src="/public/images/portfolio/IMG_8719.jpeg" alt="Engagement ring reveal photographed along the Lake Michigan shoreline" loading="lazy" decoding="async" />
     <figcaption><span>A joyful yes</span><span>Shoreline</span></figcaption>
+  </figure>
+</div>`;
+
+const MERCEDES_PORTRAIT_HTML = `
+<div class="portfolio-new-story portfolio-mercedes-story reveal visible" aria-label="Outdoor portrait story photographed by LXE Photography">
+  <figure>
+    <img src="/public/images/portfolio/mercedes-blue-dress-full.jpeg" alt="Mercedes in a blue dress photographed in front of a soft outdoor fabric backdrop among pine trees" loading="lazy" decoding="async" />
+    <figcaption><span>Portrait</span><span>Soft outdoor styling</span></figcaption>
+  </figure>
+  <figure>
+    <img src="/public/images/portfolio/mercedes-blue-dress-portrait.jpeg" alt="Close outdoor portrait of Mercedes in a blue dress with warm natural light" loading="lazy" decoding="async" />
+    <figcaption><span>Portrait</span><span>Natural light</span></figcaption>
   </figure>
 </div>`;
 
@@ -215,13 +227,20 @@ async function polishHomepage(response, url) {
   let html = await response.text();
   html = html.replace(
     "One family, one shoreline, and the honest pieces of a session that cannot be forced.",
-    "One family, one engagement, one shoreline, and the honest pieces of a session that cannot be forced."
+    "Families, engagements, and portraits—honest stories photographed with warmth and intention."
   );
 
   if (!html.includes('class="portfolio-new-story')) {
     html = html.replace(
       '<div class="portfolio-closing reveal">',
       `${ENGAGEMENT_STORY_HTML}\n\n      <div class="portfolio-closing reveal">`
+    );
+  }
+
+  if (!html.includes('class="portfolio-new-story portfolio-mercedes-story')) {
+    html = html.replace(
+      '<div class="portfolio-closing reveal">',
+      `${MERCEDES_PORTRAIT_HTML}\n\n      <div class="portfolio-closing reveal">`
     );
   }
 
