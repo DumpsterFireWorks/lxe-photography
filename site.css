@@ -884,8 +884,8 @@ h3 {
   font-size: clamp(2rem, 4vw, 3.2rem);
 }
 
-.legal-page p,
-.legal-page li { color: var(--muted); }
+.legal-page main p,
+.legal-page main li { color: var(--muted); }
 
 .legal-back { margin-top: 3rem; }
 

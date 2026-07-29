@@ -86,6 +86,27 @@ function buildMailto(data) {
   return `mailto:${PUBLIC_EMAIL}?subject=${subject}&body=${body}`;
 }
 
+function businessDateInputValue(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Detroit",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date);
+  const value = Object.fromEntries(parts.map(({ type, value: part }) => [type, part]));
+  return `${value.year}-${value.month}-${value.day}`;
+}
+
+function isValidDateInput(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const [, year, month, day] = match;
+  const parsed = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+  return parsed.getUTCFullYear() === Number(year) &&
+    parsed.getUTCMonth() === Number(month) - 1 &&
+    parsed.getUTCDate() === Number(day);
+}
+
 function validate(data) {
   const required = ["name", "email", "session", "message"];
   for (const key of required) {
@@ -94,6 +115,13 @@ function validate(data) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return "Enter a valid email address.";
   if (data.message.length > 2000) return "Message is too long.";
   if (data.agreement !== "on") return "Please confirm the booking acknowledgement.";
+  const today = businessDateInputValue();
+  for (const [key, label] of [["preferredDate", "Preferred date"], ["alternateDate", "Alternate date"]]) {
+    const value = data[key];
+    if (!value) continue;
+    if (!isValidDateInput(value)) return `Enter a valid ${label.toLowerCase()}.`;
+    if (value < today) return `${label} cannot be in the past.`;
+  }
   return null;
 }
 
