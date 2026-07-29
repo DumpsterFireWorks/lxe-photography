@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "lxe-photography",
-  "main": "src/worker.js",
+  "main": "src/entry.js",
   "compatibility_date": "2026-07-26",
   "workers_dev": true,
   "routes": [
