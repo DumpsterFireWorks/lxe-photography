@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Open your private LXE Photography client gallery using the gallery code and four-digit PIN provided by Lexus." />
+  <meta name="theme-color" content="#f4efe6" />
+  <meta property="og:title" content="Client Galleries | LXE Photography" />
+  <meta property="og:description" content="Private client gallery access for LXE Photography customers." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lxephotography.com/client-galleries/" />
+  <title>Client Galleries | LXE Photography</title>
+  <link rel="canonical" href="https://lxephotography.com/client-galleries/" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=Italiana&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/site.css?v=20260729-1" />
+  <link rel="stylesheet" href="/client-galleries/client-galleries.css?v=1" />
+  <script defer src="/config.js?v=20260729-1"></script>
+  <script defer src="/script.js?v=20260729-2"></script>
+  <script defer src="/client-galleries/client-galleries.js?v=1"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="announcement">Private photo delivery · Secure gallery access</div>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="LXE Photography home"><span class="brand-mark">LXE</span><span class="brand-sub">PHOTOGRAPHY</span></a>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation"><span></span><span></span><span></span></button>
+    <nav id="site-nav" class="site-nav" aria-label="Main navigation"><a href="/">Home</a><a href="/portfolio/">Portfolio</a><a href="/sessions/">Sessions</a><a href="/about/">About</a><a href="/client-galleries/" aria-current="page">Client Galleries</a><a class="nav-cta" href="/contact/">Inquire</a></nav>
+  </header>
+
+  <main id="main" class="client-access-main">
+    <section class="client-access-shell">
+      <div class="client-access-copy">
+        <p class="eyebrow">Private client delivery</p>
+        <h1>Your photographs,<br /><em>ready when you are.</em></h1>
+        <p>Enter the gallery code and four-digit PIN included in the message from Lexus. Both are required to protect your photographs.</p>
+        <div class="client-access-help">
+          <p><strong>Where is my gallery code?</strong></p>
+          <p>It is the last part of your private link. You may also paste the complete gallery link into the box.</p>
+          <p class="client-code-example">Example: <span>smith-family</span></p>
+        </div>
+      </div>
+
+      <section class="client-access-card" aria-labelledby="access-title">
+        <p class="eyebrow">Open my gallery</p>
+        <h2 id="access-title">Welcome back.</h2>
+        <form id="gallery-access-form" class="client-access-form">
+          <label for="gallery-code">Gallery code or complete gallery link</label>
+          <input id="gallery-code" name="galleryCode" type="text" maxlength="240" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="smith-family" required />
+
+          <label for="gallery-pin">Four-digit PIN</label>
+          <input id="gallery-pin" name="pin" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{4}" maxlength="4" placeholder="0000" required />
+
+          <button class="button button-dark" type="submit">Open my photographs</button>
+        </form>
+        <p id="gallery-access-status" class="gallery-access-status" role="status" aria-live="polite"></p>
+        <p class="client-access-contact">Missing your link or PIN? <a href="mailto:hello@lxephotography.com">Contact LXE Photography</a>.</p>
+      </section>
+    </section>
+
+    <section class="client-access-note" aria-label="Gallery availability information">
+      <div><p class="eyebrow">Please save your files</p><h2>Client galleries are available for 30 days.</h2></div>
+      <p>Download and save your finished photographs before the expiration date shown in your delivery message. Expired galleries are removed automatically.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="footer-brand"><span class="brand-mark">LXE</span><span class="brand-sub">PHOTOGRAPHY</span><small>by Lexus Erickson</small></div><nav aria-label="Footer navigation"><a href="/portfolio/">Portfolio</a><a href="/sessions/">Sessions</a><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/client-galleries/">Client Galleries</a><a href="/studio/">Photographer Login</a><a href="/policies.html">Policies</a><a href="/privacy.html">Privacy</a><a href="https://www.facebook.com/LXEPhotography/" target="_blank" rel="noopener noreferrer">Facebook</a></nav><p>© <span id="year"></span> LXE Photography. All rights reserved.</p></footer>
+</body>
+</html>
