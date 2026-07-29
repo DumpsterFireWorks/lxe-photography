@@ -51,6 +51,20 @@ function safeArchiveName(value) {
     .slice(0, 70) || "lxe-gallery";
 }
 
+function safeZipEntryName(value, index) {
+  const cleaned = String(value || "photo.jpg")
+    .replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "-")
+    .replace(/^\.+/, "")
+    .slice(0, 180) || "photo.jpg";
+  return `${String(index + 1).padStart(3, "0")}-${cleaned}`;
+}
+
+function zipMemoryLimit() {
+  const isAppleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  return (isAppleMobile ? 150 : 350) * 1024 ** 2;
+}
+
 function renderError(message, expired = false) {
   app.innerHTML = `<section class="${expired ? "expired-panel" : "error-panel"}">
     <p class="eyebrow">LXE Photography</p>
@@ -61,11 +75,12 @@ function renderError(message, expired = false) {
 }
 
 function renderPin() {
+  const expiration = gallery?.expiresAt ? `<p>This private gallery expires on <strong>${formatDate(gallery.expiresAt)}</strong>.</p>` : "";
   app.innerHTML = `<section class="lock-panel">
     <p class="eyebrow">Private client gallery</p>
-    <h1>${escapeHtml(gallery.title)}</h1>
-    <p>Prepared for ${escapeHtml(gallery.clientName)} by LXE Photography.</p>
-    <p>This gallery is private and expires on <strong>${formatDate(gallery.expiresAt)}</strong>.</p>
+    <h1>Your photographs<br />are ready.</h1>
+    <p>Enter the four-digit PIN included in the message from Lexus.</p>
+    ${expiration}
     <form id="pin-form" class="pin-form">
       <label>Four-digit gallery PIN<input id="pin-input" name="pin" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{4}" maxlength="4" required autofocus /></label>
       <button class="primary-button" type="submit">Open my photos</button>
@@ -110,9 +125,9 @@ function renderGallery() {
     </div>
   </section>
   ${photos.length ? `<section class="client-grid" aria-label="Client photographs">${photos.map((photo, index) => `<figure class="client-photo">
-    <img src="${photo.viewUrl}" alt="Photograph ${index + 1} from ${escapeHtml(gallery.title)}" loading="${index < 2 ? "eager" : "lazy"}" />
+    <img src="${photo.viewUrl}" alt="Photograph ${index + 1} from ${escapeHtml(gallery.title)}" loading="${index < 2 ? "eager" : "lazy"}" decoding="async" />
     <span class="photo-number">${String(index + 1).padStart(2, "0")}</span>
-    <div class="photo-actions"><a class="download-button" href="${photo.downloadUrl}" download="${escapeHtml(photo.originalName)}">Download</a></div>
+    <div class="photo-actions"><a class="view-button" href="${photo.viewUrl}" target="_blank" rel="noopener noreferrer">View full size</a><a class="download-button" href="${photo.downloadUrl}" download="${escapeHtml(photo.originalName)}">Download</a></div>
   </figure>`).join("")}</section>` : '<section class="empty-gallery"><p>Your photographer is still preparing this gallery.</p></section>'}`;
 
   document.querySelector("#download-all")?.addEventListener("click", downloadAllAsZip);
@@ -226,8 +241,9 @@ async function downloadAllAsZip() {
   if (!photos.length) return;
 
   const totalBytes = photos.reduce((sum, photo) => sum + Number(photo.sizeBytes || 0), 0);
-  if (totalBytes > 1.5 * 1024 ** 3) {
-    label.textContent = "This gallery is too large to package safely in the browser. Download the photographs individually.";
+  const limit = zipMemoryLimit();
+  if (totalBytes > limit) {
+    label.textContent = `This gallery is too large to package safely on this device. Download the photographs individually instead.`;
     panel.hidden = false;
     return;
   }
@@ -241,11 +257,11 @@ async function downloadAllAsZip() {
   try {
     for (let index = 0; index < photos.length; index += 1) {
       const photo = photos[index];
-      label.textContent = `Adding ${photo.originalName}`;
+      label.textContent = `Adding photograph ${index + 1}`;
       count.textContent = `${index + 1} of ${photos.length}`;
       const response = await fetch(photo.downloadUrl, { credentials: "same-origin" });
-      if (!response.ok) throw new Error(`Could not download ${photo.originalName}.`);
-      files.push({ name: photo.originalName, bytes: new Uint8Array(await response.arrayBuffer()) });
+      if (!response.ok) throw new Error(`Could not download photograph ${index + 1}.`);
+      files.push({ name: safeZipEntryName(photo.originalName, index), bytes: new Uint8Array(await response.arrayBuffer()) });
       bar.value = index + 1;
     }
 
@@ -285,8 +301,8 @@ async function loadGallery() {
   try {
     const data = await api(`/api/client-gallery/${encodeURIComponent(slug)}`);
     gallery = data.gallery;
-    document.title = `${gallery.title} | LXE Photography`;
     if (data.unlocked) return loadPhotos();
+    document.title = "Private Client Gallery | LXE Photography";
     renderPin();
   } catch (error) {
     renderError(error.message, error.status === 410);
