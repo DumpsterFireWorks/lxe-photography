@@ -27,6 +27,22 @@
       "destination_address": "lynnlexus421@gmail.com"
     }
   ],
+  "d1_databases": [
+    {
+      "binding": "GALLERY_DB"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "GALLERY_BUCKET",
+      "bucket_name": "lxe-client-galleries"
+    }
+  ],
+  "secrets": {
+    "required": [
+      "GALLERY_AUTH_SECRET"
+    ]
+  },
   "triggers": {
     "crons": [
       "15 * * * *"
