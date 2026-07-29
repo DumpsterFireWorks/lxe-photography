@@ -5,6 +5,8 @@ on:
     paths:
       - "src/**"
       - "studio/**"
+      - "client-galleries/**"
+      - "script.js"
       - "gallery-portal.*"
       - "migrations/**"
       - "wrangler.jsonc"
