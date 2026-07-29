@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /studio/
+Disallow: /gallery/
+Disallow: /api/studio/
+Disallow: /api/client-gallery/
 
 Sitemap: https://lxephotography.com/sitemap.xml

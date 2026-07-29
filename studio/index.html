@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#f4efe6" />
+  <title>LXE Studio | Client Galleries</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=Italiana&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/studio/studio.css?v=1" />
+  <script defer src="/studio/studio.js?v=1"></script>
+</head>
+<body>
+  <header class="studio-header">
+    <a class="studio-brand" href="/" aria-label="LXE Photography home"><span>LXE</span><small>PHOTOGRAPHY STUDIO</small></a>
+    <button id="logout-button" class="quiet-button" type="button" hidden>Sign out</button>
+  </header>
+
+  <main class="studio-shell">
+    <section id="login-view" class="login-panel" aria-labelledby="login-title">
+      <p class="eyebrow">Private studio access</p>
+      <h1 id="login-title">Welcome back,<br /><em>Lexus.</em></h1>
+      <p class="intro">Enter the studio email and Lexus will receive a six-digit sign-in code. No password to remember.</p>
+
+      <form id="email-form" class="studio-form">
+        <label>Email address<input id="login-email" name="email" type="email" value="lynnlexus421@gmail.com" required autocomplete="email" /></label>
+        <button class="primary-button" type="submit">Send sign-in code</button>
+      </form>
+
+      <form id="code-form" class="studio-form" hidden>
+        <label>Six-digit code<input id="login-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
+        <button class="primary-button" type="submit">Open the studio</button>
+        <button id="request-another-code" class="text-button" type="button">Send another code</button>
+      </form>
+      <p id="login-status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="dashboard-view" hidden>
+      <div class="dashboard-heading">
+        <div><p class="eyebrow">Client delivery</p><h1>Create, upload,<br /><em>send, done.</em></h1></div>
+        <p>Every new gallery receives a private link, a four-digit client PIN, and a fixed 30-day expiration. After expiration the link stops working immediately and the stored files are removed automatically.</p>
+      </div>
+
+      <section class="create-panel" aria-labelledby="create-title">
+        <div><p class="eyebrow">New gallery</p><h2 id="create-title">Create a client delivery</h2></div>
+        <form id="create-gallery-form" class="create-grid">
+          <label>Client name<input name="clientName" required maxlength="120" placeholder="Taylor Smith" /></label>
+          <label>Gallery title<input name="title" required maxlength="120" placeholder="Smith Family — Lake Michigan" /></label>
+          <label>Four-digit PIN<span class="pin-row"><input id="gallery-pin" name="pin" required inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="4826" /><button id="generate-pin" class="small-button" type="button">Generate</button></span></label>
+          <label>Link name <small>optional</small><input name="slug" maxlength="60" placeholder="smith-family" /></label>
+          <button class="primary-button full-row" type="submit">Create 30-day gallery</button>
+        </form>
+        <p id="create-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="share-panel" class="share-panel" hidden>
+        <div><p class="eyebrow">Ready to upload</p><h2>Your private client link is ready.</h2></div>
+        <dl><div><dt>Link</dt><dd><a id="new-gallery-link" href="#" target="_blank" rel="noopener noreferrer"></a></dd></div><div><dt>PIN</dt><dd id="new-gallery-pin"></dd></div><div><dt>Expires</dt><dd id="new-gallery-expiry"></dd></div></dl>
+        <div class="button-row"><button id="copy-client-message" class="primary-button" type="button">Copy client message</button><button id="manage-new-gallery" class="secondary-button" type="button">Upload photos</button></div>
+      </section>
+
+      <section class="gallery-list-section" aria-labelledby="gallery-list-title">
+        <div class="section-heading"><div><p class="eyebrow">Current deliveries</p><h2 id="gallery-list-title">Client galleries</h2></div><button id="refresh-galleries" class="quiet-button" type="button">Refresh</button></div>
+        <div id="gallery-list" class="gallery-list"><p class="empty-state">Loading galleries…</p></div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="manage-dialog" class="manage-dialog">
+    <form method="dialog" class="dialog-top"><div><p class="eyebrow">Manage gallery</p><h2 id="manage-title">Client gallery</h2></div><button class="dialog-close" value="cancel" aria-label="Close">×</button></form>
+    <div class="manage-meta"><a id="manage-link" href="#" target="_blank" rel="noopener noreferrer"></a><span id="manage-expiry"></span></div>
+    <label class="upload-drop">Add finished JPEG, PNG, or WebP photographs<input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp" multiple /></label>
+    <button id="upload-button" class="primary-button" type="button">Upload selected photos</button>
+    <div id="upload-progress" class="upload-progress" hidden><div><span id="upload-progress-label">Uploading…</span><strong id="upload-progress-count"></strong></div><progress id="upload-progress-bar" max="100" value="0"></progress></div>
+    <p id="manage-status" class="status" role="status" aria-live="polite"></p>
+    <div id="photo-list" class="photo-list"></div>
+    <div class="danger-zone"><p><strong>Delete gallery now</strong><br />This permanently removes the client link and every uploaded photo.</p><button id="delete-gallery-button" class="danger-button" type="button">Delete gallery</button></div>
+  </dialog>
+
+  <footer class="studio-footer">LXE Photography private studio · Not indexed by search engines</footer>
+</body>
+</html>
