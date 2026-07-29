@@ -5,35 +5,25 @@ const inquiryEndpoint = config.inquiryEndpoint || "/api/inquiry";
 const menuButton = document.querySelector(".menu-button");
 const siteNav = document.querySelector(".site-nav");
 
-function addPortalLinks() {
-  if (siteNav && !siteNav.querySelector('a[href="/client-galleries/"]')) {
-    const clientLink = document.createElement("a");
-    clientLink.href = "/client-galleries/";
-    clientLink.textContent = "Client Galleries";
-    if (window.location.pathname.startsWith("/client-galleries")) clientLink.setAttribute("aria-current", "page");
-    const inquiryLink = siteNav.querySelector(".nav-cta");
-    siteNav.insertBefore(clientLink, inquiryLink || null);
-  }
-
-  const footerNav = document.querySelector(".site-footer nav");
-  if (!footerNav) return;
-
-  if (!footerNav.querySelector('a[href="/client-galleries/"]')) {
-    const clientLink = document.createElement("a");
-    clientLink.href = "/client-galleries/";
-    clientLink.textContent = "Client Galleries";
-    footerNav.appendChild(clientLink);
-  }
-
-  if (!footerNav.querySelector('a[href="/studio/"]')) {
-    const studioLink = document.createElement("a");
-    studioLink.href = "/studio/";
-    studioLink.textContent = "Photographer Login";
-    footerNav.appendChild(studioLink);
-  }
+function addLinkIfMissing(container, href, text, { beforeSelector = "" } = {}) {
+  if (!container || container.querySelector(`a[href="${href}"]`)) return;
+  const link = document.createElement("a");
+  link.href = href;
+  link.textContent = text;
+  const before = beforeSelector ? container.querySelector(beforeSelector) : null;
+  if (before) before.before(link);
+  else container.append(link);
 }
 
-addPortalLinks();
+function ensurePortalNavigation() {
+  addLinkIfMissing(siteNav, "/client-galleries/", "Client Galleries", { beforeSelector: ".nav-cta" });
+
+  const footerNav = document.querySelector(".site-footer nav");
+  addLinkIfMissing(footerNav, "/client-galleries/", "Client Galleries", { beforeSelector: 'a[href="/policies.html"]' });
+  addLinkIfMissing(footerNav, "/studio/", "Photographer Login", { beforeSelector: 'a[href="/policies.html"]' });
+}
+
+ensurePortalNavigation();
 
 function closeMenu({ returnFocus = false } = {}) {
   if (!siteNav || !menuButton) return;
@@ -144,6 +134,46 @@ function setFormStatus(message, type = "") {
   formStatus.className = `form-status full-field${type ? ` ${type}` : ""}`;
 }
 
+function ensureSelectOption(select, value) {
+  if (!select || !value) return;
+  if (!Array.from(select.options).some((option) => option.value === value)) {
+    select.add(new Option(value, value));
+  }
+  select.value = value;
+}
+
+function localDateInputValue(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function prefillInquiryFromUrl() {
+  if (!contactForm) return;
+
+  contactForm.querySelectorAll('input[type="date"]').forEach((input) => {
+    input.min = localDateInputValue();
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  const session = params.get("session") || "";
+  const preferredDate = params.get("date") || "";
+  const preferredTime = params.get("time") || "";
+  const message = params.get("message") || "";
+
+  ensureSelectOption(contactForm.elements.namedItem("session"), session);
+  if (preferredDate) contactForm.elements.namedItem("preferredDate").value = preferredDate;
+  ensureSelectOption(contactForm.elements.namedItem("preferredTime"), preferredTime);
+  if (message) contactForm.elements.namedItem("message").value = message;
+
+  if (session || preferredDate || preferredTime || message) {
+    setFormStatus("Your selected session details were added below. Finish the inquiry and press send.", "success");
+  }
+}
+
+prefillInquiryFromUrl();
+
 function buildInquiryBody(data) {
   return [
     `Name: ${data.name}`,
@@ -174,7 +204,7 @@ contactForm?.addEventListener("submit", async (event) => {
 
   const formData = new FormData(contactForm);
   const payload = Object.fromEntries(formData.entries());
-  payload.page = window.location.href;
+  payload.page = `${window.location.origin}${window.location.pathname}`;
 
   submitButton?.setAttribute("disabled", "");
   setFormStatus("Sending your inquiry…");
@@ -187,18 +217,22 @@ contactForm?.addEventListener("submit", async (event) => {
     });
 
     const result = await response.json().catch(() => ({}));
-
     if (!response.ok) {
-      const fallbackUrl = result.fallbackUrl || buildMailto(payload);
-      window.location.href = fallbackUrl;
-      setFormStatus("Your email app should open with the inquiry ready. Review it and press send.", "success");
+      if ([502, 503].includes(response.status)) {
+        const fallbackUrl = result.fallbackUrl || buildMailto(payload);
+        window.location.href = fallbackUrl;
+        setFormStatus("Your email app should open with the inquiry ready. Review it and press send.", "success");
+        return;
+      }
+
+      setFormStatus(result.error || "The inquiry could not be sent. Please check the form and try again.", "error");
       return;
     }
 
     contactForm.reset();
     if (startedAt) startedAt.value = String(Date.now());
     setFormStatus("Thank you. Your inquiry was sent to Lexus, and she will follow up personally.", "success");
-  } catch (error) {
+  } catch {
     window.location.href = buildMailto(payload);
     setFormStatus("Your email app should open with the inquiry ready. Review it and press send.", "success");
   } finally {
