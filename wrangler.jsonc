@@ -26,5 +26,10 @@
       "name": "EMAIL",
       "destination_address": "lynnlexus421@gmail.com"
     }
-  ]
+  ],
+  "triggers": {
+    "crons": [
+      "15 * * * *"
+    ]
+  }
 }
