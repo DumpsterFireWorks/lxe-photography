@@ -7,12 +7,15 @@ on:
       - "studio/**"
       - "client-galleries/**"
       - "**/*.html"
+      - "**/*.css"
       - "script.js"
+      - "payment-ready.js"
       - "gallery-portal.*"
       - "migrations/**"
       - "wrangler.jsonc"
       - "package.json"
       - "sitemap.xml"
+      - ".github/scripts/**"
       - ".github/workflows/portal-check.yml"
   workflow_dispatch:
 
@@ -37,6 +40,9 @@ jobs:
 
       - name: Check JavaScript syntax
         run: npm run check
+
+      - name: Audit static website
+        run: npm run audit
 
       - name: Build Worker bundle
         run: npx wrangler deploy --dry-run --outdir .wrangler-dry-run
