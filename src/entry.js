@@ -1,10 +1,11 @@
 import worker from "./worker.js";
 import { ensureGallerySchema } from "./gallery-schema.js";
 
-function usesGalleryPortal(pathname) {
+function usesPersistentDatabase(pathname) {
   return pathname === "/studio" ||
     pathname.startsWith("/studio/") ||
     pathname.startsWith("/gallery/") ||
+    pathname === "/api/inquiry" ||
     pathname.startsWith("/api/studio/") ||
     pathname.startsWith("/api/client-gallery/");
 }
@@ -12,7 +13,7 @@ function usesGalleryPortal(pathname) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (usesGalleryPortal(url.pathname) && env.GALLERY_DB) {
+    if (usesPersistentDatabase(url.pathname) && env.GALLERY_DB) {
       await ensureGallerySchema(env);
     }
     return worker.fetch(request, env, ctx);
