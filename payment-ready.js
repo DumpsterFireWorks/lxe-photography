@@ -77,7 +77,7 @@
         <p>Perfect for couples, families, kids, maternity, best friends, or a quick portrait update. Sessions run back-to-back, so please arrive a few minutes early.</p>
         <p class="saturday-slot-label">Choose a time to request:</p>
         <div class="saturday-slot-grid">
-          ${slots.map((slot) => `<button type="button" class="saturday-slot" data-slot="${slot}">${slot}</button>`).join("")}
+          ${slots.map((slot) => `<button type="button" class="saturday-slot" data-slot="${slot}" aria-pressed="false">${slot}</button>`).join("")}
         </div>
         <p class="saturday-slot-status" role="status" aria-live="polite"></p>
         <p class="saturday-mini-note">A time is not reserved until Lexus confirms it and receives the $25 retainer. Exact location details are provided after confirmation.</p>
@@ -92,44 +92,58 @@
     }
 
     const contactForm = document.querySelector("#contact-form");
-    const sessionSelect = contactForm?.elements.namedItem("session");
-    const dateInput = contactForm?.elements.namedItem("preferredDate");
-    const timeSelect = contactForm?.elements.namedItem("preferredTime");
-    const messageInput = contactForm?.elements.namedItem("message");
-    const nameInput = contactForm?.elements.namedItem("name");
     const slotStatus = section.querySelector(".saturday-slot-status");
+
+    function chooseSlot(slot, selectedButton) {
+      const sessionName = "Saturday Golden Hour Mini";
+      const message = `Saturday golden-hour mini request for ${slot}. Session is for: `;
+
+      section.querySelectorAll(".saturday-slot").forEach((slotButton) => {
+        const selected = slotButton === selectedButton;
+        slotButton.classList.toggle("selected", selected);
+        slotButton.setAttribute("aria-pressed", String(selected));
+      });
+
+      if (slotStatus) {
+        slotStatus.textContent = `${slot} selected. Opening the inquiry form so Lexus can confirm it.`;
+      }
+
+      if (!contactForm) {
+        const inquiryUrl = new URL("/contact/", window.location.origin);
+        inquiryUrl.searchParams.set("session", sessionName);
+        inquiryUrl.searchParams.set("date", "2026-08-01");
+        inquiryUrl.searchParams.set("time", slot);
+        inquiryUrl.searchParams.set("message", message);
+        window.location.assign(inquiryUrl.toString());
+        return;
+      }
+
+      const sessionSelect = contactForm.elements.namedItem("session");
+      const dateInput = contactForm.elements.namedItem("preferredDate");
+      const timeSelect = contactForm.elements.namedItem("preferredTime");
+      const messageInput = contactForm.elements.namedItem("message");
+      const nameInput = contactForm.elements.namedItem("name");
+
+      if (sessionSelect && !Array.from(sessionSelect.options).some((option) => option.value === sessionName)) {
+        sessionSelect.add(new Option(sessionName, sessionName));
+      }
+      if (sessionSelect) sessionSelect.value = sessionName;
+      if (dateInput) dateInput.value = "2026-08-01";
+
+      if (timeSelect && !Array.from(timeSelect.options).some((option) => option.value === slot)) {
+        timeSelect.add(new Option(slot, slot));
+      }
+      if (timeSelect) timeSelect.value = slot;
+      if (messageInput) messageInput.value = message;
+
+      contactForm.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.setTimeout(() => nameInput?.focus(), 550);
+    }
 
     section.querySelectorAll(".saturday-slot").forEach((button) => {
       button.addEventListener("click", () => {
         const slot = button.dataset.slot;
-        if (!slot || !contactForm) return;
-
-        const sessionName = "Saturday Golden Hour Mini";
-        if (sessionSelect && !Array.from(sessionSelect.options).some((option) => option.value === sessionName)) {
-          sessionSelect.add(new Option(sessionName, sessionName));
-        }
-        if (sessionSelect) sessionSelect.value = sessionName;
-        if (dateInput) dateInput.value = "2026-08-01";
-
-        if (timeSelect && !Array.from(timeSelect.options).some((option) => option.value === slot)) {
-          timeSelect.add(new Option(slot, slot));
-        }
-        if (timeSelect) timeSelect.value = slot;
-
-        if (messageInput) {
-          messageInput.value = `Saturday golden-hour mini request for ${slot}. Session is for: `;
-        }
-
-        section.querySelectorAll(".saturday-slot").forEach((slotButton) => {
-          slotButton.classList.toggle("selected", slotButton === button);
-        });
-
-        if (slotStatus) {
-          slotStatus.textContent = `${slot} selected. Finish the short inquiry below so Lexus can confirm it.`;
-        }
-
-        document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.setTimeout(() => nameInput?.focus(), 550);
+        if (slot) chooseSlot(slot, button);
       });
     });
   }
