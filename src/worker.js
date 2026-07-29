@@ -13,19 +13,23 @@ const PRIVATE_ASSET_PREFIXES = [
   "/docs/",
   "/.github/",
   "/node_modules/",
-  "/.wrangler/"
+  "/.wrangler/",
+  "/.git/",
+  "/.vscode/",
+  "/.idea/",
+  "/.env",
+  "/.dev.vars"
 ];
 
 const PRIVATE_ASSET_PATHS = new Set([
   "/package.json",
   "/package-lock.json",
   "/wrangler.jsonc",
+  "/wrangler.toml",
   "/.gitignore",
-  "/.dev.vars",
-  "/.env",
-  "/README.md",
-  "/AGENTS.md",
-  "/CLAUDE.md"
+  "/readme.md",
+  "/agents.md",
+  "/claude.md"
 ]);
 
 const PUBLIC_HTML_CSP = [
@@ -113,6 +117,8 @@ function isProtectedMutation(request, url) {
 }
 
 function isSameOriginRequest(request, url) {
+  const fetchSite = request.headers.get("Sec-Fetch-Site");
+  if (fetchSite && !["same-origin", "same-site", "none"].includes(fetchSite)) return false;
   const origin = request.headers.get("Origin");
   return !origin || origin === url.origin;
 }
