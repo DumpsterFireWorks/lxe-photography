@@ -5,6 +5,36 @@ const inquiryEndpoint = config.inquiryEndpoint || "/api/inquiry";
 const menuButton = document.querySelector(".menu-button");
 const siteNav = document.querySelector(".site-nav");
 
+function addPortalLinks() {
+  if (siteNav && !siteNav.querySelector('a[href="/client-galleries/"]')) {
+    const clientLink = document.createElement("a");
+    clientLink.href = "/client-galleries/";
+    clientLink.textContent = "Client Galleries";
+    if (window.location.pathname.startsWith("/client-galleries")) clientLink.setAttribute("aria-current", "page");
+    const inquiryLink = siteNav.querySelector(".nav-cta");
+    siteNav.insertBefore(clientLink, inquiryLink || null);
+  }
+
+  const footerNav = document.querySelector(".site-footer nav");
+  if (!footerNav) return;
+
+  if (!footerNav.querySelector('a[href="/client-galleries/"]')) {
+    const clientLink = document.createElement("a");
+    clientLink.href = "/client-galleries/";
+    clientLink.textContent = "Client Galleries";
+    footerNav.appendChild(clientLink);
+  }
+
+  if (!footerNav.querySelector('a[href="/studio/"]')) {
+    const studioLink = document.createElement("a");
+    studioLink.href = "/studio/";
+    studioLink.textContent = "Photographer Login";
+    footerNav.appendChild(studioLink);
+  }
+}
+
+addPortalLinks();
+
 function closeMenu({ returnFocus = false } = {}) {
   if (!siteNav || !menuButton) return;
   siteNav.classList.remove("open");

@@ -5,10 +5,14 @@ on:
     paths:
       - "src/**"
       - "studio/**"
+      - "client-galleries/**"
+      - "**/*.html"
+      - "script.js"
       - "gallery-portal.*"
       - "migrations/**"
       - "wrangler.jsonc"
       - "package.json"
+      - "sitemap.xml"
       - ".github/workflows/portal-check.yml"
   workflow_dispatch:
 
