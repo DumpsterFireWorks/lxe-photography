@@ -42,7 +42,7 @@ jobs:
       - name: Check JavaScript syntax
         run: npm run check
 
-      - name: Static website audit
+      - name: Audit static website
         run: npm run audit
 
       - name: Build Worker bundle
