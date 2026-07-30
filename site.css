@@ -663,8 +663,10 @@ h3 {
 
 .faq summary {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  min-height: 44px;
   cursor: pointer;
   list-style: none;
   font-family: "Cormorant Garamond", serif;
