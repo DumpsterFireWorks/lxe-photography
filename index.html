@@ -20,17 +20,98 @@
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <script src="/homepage-hero.js?v=20260730-2"></script>
+  <script>
+    (() => {
+      const dayMs = 24 * 60 * 60 * 1000;
+      const rotationDays = 7;
+      const rotationStart = Date.UTC(2026, 6, 30);
+      const businessDateFormatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Detroit",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      });
+      const heroes = [
+        {
+          id: "couples",
+          src: "/public/images/portfolio/couples-beach-shore-kiss.jpg",
+          alt: "Couple embracing beside the Lake Michigan shoreline",
+          width: 1024,
+          height: 1280,
+          desktopPosition: "50% 48%",
+          mobilePosition: "50% 42%"
+        },
+        {
+          id: "portraits",
+          src: "/public/images/portfolio/mercedes/woodland-close-portrait.jpeg",
+          alt: "Close outdoor portrait in a blue dress beneath the trees",
+          width: 1365,
+          height: 2048,
+          desktopPosition: "50% 22%",
+          mobilePosition: "50% 32%"
+        },
+        {
+          id: "motherhood",
+          src: "/portfolio/motherhood-newborns/IMG_8924.jpeg",
+          alt: "Mother holding her newborn beside the lake in warm natural light",
+          width: 1365,
+          height: 2048,
+          desktopPosition: "50% 24%",
+          mobilePosition: "52% 36%"
+        },
+        {
+          id: "families",
+          src: "/public/images/portfolio/family-beach-lift.jpg",
+          alt: "Family laughing together near the Lake Michigan shoreline",
+          width: 1536,
+          height: 864,
+          desktopPosition: "50% center",
+          mobilePosition: "48% center"
+        }
+      ];
+      const parts = Object.fromEntries(
+        businessDateFormatter
+          .formatToParts(new Date())
+          .filter(({ type }) => type !== "literal")
+          .map(({ type, value }) => [type, Number(value)])
+      );
+      const businessDate = Date.UTC(parts.year, parts.month - 1, parts.day);
+      const elapsedDays = Math.max(0, Math.floor((businessDate - rotationStart) / dayMs));
+      const activeHero = heroes[Math.floor(elapsedDays / rotationDays) % heroes.length];
+      const preload = document.createElement("link");
+      preload.rel = "preload";
+      preload.as = "image";
+      preload.type = "image/jpeg";
+      preload.href = activeHero.src;
+      preload.setAttribute("fetchpriority", "high");
+      document.head.appendChild(preload);
+      window.LXE_HOMEPAGE_HERO = Object.freeze({
+        active: Object.freeze({ ...activeHero }),
+        render(slotId) {
+          const image = document.getElementById(slotId);
+          if (!(image instanceof HTMLImageElement)) return false;
+          image.src = activeHero.src;
+          image.alt = activeHero.alt;
+          image.width = activeHero.width;
+          image.height = activeHero.height;
+          image.dataset.hero = activeHero.id;
+          image.style.setProperty("--hero-desktop-position", activeHero.desktopPosition);
+          image.style.setProperty("--hero-mobile-position", activeHero.mobilePosition);
+          return true;
+        }
+      });
+    })();
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=Italiana&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/site.css?v=20260729-7" />
   <link rel="stylesheet" href="/pages.css?v=20260729-4" />
   <link rel="stylesheet" href="/payment-ready.css?v=20260729-4" />
   <style>
     .hero { background: #17190f; }
-    .hero-image { object-position: var(--hero-desktop-position, 50% center); }
+    .hero-image { object-position: var(--hero-desktop-position, 50% 42%); }
     .hero-note { color: rgba(255,255,255,.88); }
     .hero-copy h1,.hero-copy .hero-lede,.hero-copy .eyebrow,.hero-copy .hero-note,.hero-copy .light-link { text-shadow: 0 2px 18px rgba(0,0,0,.58),0 1px 2px rgba(0,0,0,.35); }
-    @media (max-width:620px){.hero-image{object-position:var(--hero-mobile-position,48% center)!important}.hero-overlay{background:linear-gradient(90deg,rgba(17,19,14,.74) 0%,rgba(17,19,14,.48) 48%,rgba(17,19,14,.14) 100%),linear-gradient(180deg,rgba(17,19,14,.06) 0%,rgba(17,19,14,.20) 30%,rgba(17,19,14,.72) 67%,rgba(17,19,14,.95) 100%)!important}}
+    @media (max-width:620px){.hero-image{object-position:var(--hero-mobile-position,50% 42%)!important}.hero-overlay{background:linear-gradient(90deg,rgba(17,19,14,.74) 0%,rgba(17,19,14,.48) 48%,rgba(17,19,14,.14) 100%),linear-gradient(180deg,rgba(17,19,14,.06) 0%,rgba(17,19,14,.20) 30%,rgba(17,19,14,.72) 67%,rgba(17,19,14,.95) 100%)!important}}
   </style>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"LXE Photography","url":"https://lxephotography.com/","email":"hello@lxephotography.com","image":"https://lxephotography.com/portfolio/motherhood-newborns/IMG_8924.jpeg","priceRange":"$","founder":{"@type":"Person","name":"Lexus Erickson"},"areaServed":[{"@type":"City","name":"Muskegon"},{"@type":"AdministrativeArea","name":"West Michigan"}],"sameAs":["https://www.facebook.com/LXEPhotography/"]}</script>
   <script defer src="/config.js?v=20260729-4"></script>
@@ -47,7 +128,7 @@
   </header>
   <main id="main">
     <section class="hero">
-      <img id="home-hero-image-slot" class="hero-image" src="/public/images/portfolio/family-beach-lift.jpg" alt="A family laughing together near the Lake Michigan shoreline" width="1536" height="864" loading="eager" fetchpriority="high" decoding="async" style="--hero-desktop-position:50% center;--hero-mobile-position:48% center" />
+      <img id="home-hero-image-slot" class="hero-image" src="/public/images/portfolio/couples-beach-shore-kiss.jpg" alt="Couple embracing beside the Lake Michigan shoreline" width="1024" height="1280" loading="eager" fetchpriority="high" decoding="async" style="--hero-desktop-position:50% 48%;--hero-mobile-position:50% 42%" />
       <script>window.LXE_HOMEPAGE_HERO?.render("home-hero-image-slot");</script>
       <div class="hero-overlay"></div>
       <div class="hero-copy reveal"><p class="eyebrow light">LXE Photography · By Lexus Erickson</p><h1>Hold onto<br /><em>what matters.</em></h1><p class="hero-lede">Natural, heartfelt photography for the people and seasons you never want to forget.</p><div class="hero-actions"><a class="button button-light" href="/portfolio/">Explore the portfolio</a><a class="text-link light-link" href="/contact/">Inquire about a session <span aria-hidden="true">→</span></a></div><p class="hero-note">Relaxed direction, thoughtful editing, and meaningful photographs across Muskegon and West Michigan.</p></div>
