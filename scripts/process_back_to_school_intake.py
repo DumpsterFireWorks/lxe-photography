@@ -9,6 +9,7 @@ BRANCH_INTAKE = Path("portfolio-intake")
 PUBLIC_DIR = Path("public/images/portfolio/seasonal")
 MINIS_PAGE = Path("portfolio/minis-seasonal/index.html")
 PORTFOLIO_PAGE = Path("portfolio/index.html")
+SITE_AUDIT = Path(".github/scripts/site-audit.mjs")
 MAX_SIZE = (1365, 2048)
 MAX_BYTES = 650_000
 
@@ -92,6 +93,17 @@ def update_portfolio_card() -> None:
     PORTFOLIO_PAGE.write_text(source, encoding="utf-8")
 
 
+def update_site_audit() -> None:
+    source = SITE_AUDIT.read_text(encoding="utf-8")
+    entry = '  ["portfolio/minis-seasonal/index.html", "/public/images/portfolio/seasonal/back-to-school-chair-books.jpg"],\n'
+    if entry not in source:
+        marker = '  ["portfolio/motherhood-newborns/index.html", "/portfolio/motherhood-newborns/IMG_8924.jpeg"],\n'
+        if marker not in source:
+            raise RuntimeError("Could not locate LCP audit insertion point")
+        source = source.replace(marker, marker + entry)
+    SITE_AUDIT.write_text(source, encoding="utf-8")
+
+
 def main() -> None:
     results = {}
     for source_name, destination_name in FILES.items():
@@ -112,6 +124,7 @@ def main() -> None:
 
     MINIS_PAGE.write_text(MINIS_HTML, encoding="utf-8")
     update_portfolio_card()
+    update_site_audit()
 
     for source_name in FILES:
         (BRANCH_INTAKE / source_name).unlink()
