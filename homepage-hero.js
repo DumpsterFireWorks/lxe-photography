@@ -2,6 +2,12 @@
   const dayMs = 24 * 60 * 60 * 1000;
   const rotationDays = 7;
   const rotationStart = Date.UTC(2026, 6, 30);
+  const businessDateFormatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Detroit",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
 
   const heroes = [
     {
@@ -42,11 +48,17 @@
     }
   ];
 
-  function localDateAsUtc(date) {
-    return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  function businessDateAsUtc(date) {
+    const parts = Object.fromEntries(
+      businessDateFormatter
+        .formatToParts(date)
+        .filter(({ type }) => type !== "literal")
+        .map(({ type, value }) => [type, Number(value)])
+    );
+    return Date.UTC(parts.year, parts.month - 1, parts.day);
   }
 
-  const elapsedDays = Math.max(0, Math.floor((localDateAsUtc(new Date()) - rotationStart) / dayMs));
+  const elapsedDays = Math.max(0, Math.floor((businessDateAsUtc(new Date()) - rotationStart) / dayMs));
   const activeHero = heroes[Math.floor(elapsedDays / rotationDays) % heroes.length];
 
   const preload = document.createElement("link");
