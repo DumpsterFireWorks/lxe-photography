@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import shutil
 
 from PIL import Image, ImageOps
 
@@ -85,7 +84,7 @@ def optimize_image(source: Path, destination: Path) -> tuple[int, int, int]:
 def update_portfolio_card() -> None:
     source = PORTFOLIO_PAGE.read_text(encoding="utf-8")
     source = source.replace(
-        '/public/images/portfolio/seasonal/back-to-school-portrait.jpg" alt="Young student posing with books and a Back to School chalkboard" width="900" height="1125"',
+        '/public/images/portfolio/seasonal/back-to-school-portrait.jpg" alt="Young student smiling beside books and a Back to School chalkboard" width="900" height="1125"',
         '/public/images/portfolio/seasonal/back-to-school-chair-books.jpg" alt="Young student resting on books beside a Back to School chalkboard" width="1365" height="1706"',
     )
     if "back-to-school-chair-books.jpg" not in source:
