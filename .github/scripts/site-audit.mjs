@@ -128,6 +128,26 @@ function titleValue(html) {
   return match ? decodeHtml(match[1].trim()) : "";
 }
 
+function jsonLdValues(html, name) {
+  const values = [];
+  for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    if (attributeValue(`<script${match[1]}>`, "type").toLowerCase() !== "application/ld+json") continue;
+    try {
+      values.push(JSON.parse(match[2]));
+    } catch (error) {
+      errors.push(`${name}: invalid JSON-LD (${error.message})`);
+    }
+  }
+  return values;
+}
+
+function schemaTypes(value) {
+  if (!value || typeof value !== "object") return [];
+  const types = Array.isArray(value["@type"]) ? value["@type"] : [value["@type"]];
+  const graphTypes = Array.isArray(value["@graph"]) ? value["@graph"].flatMap(schemaTypes) : [];
+  return [...types.filter(Boolean), ...graphTypes];
+}
+
 function hasClass(tag, name) {
   return attributeValue(tag, "class").split(/\s+/).includes(name);
 }
@@ -198,6 +218,11 @@ function auditInteractiveMarkup(source, name, { requirePageControls = false } = 
   }
 
   if (!requirePageControls) return;
+
+  for (const landmark of ["header", "main", "footer"]) {
+    const count = [...source.matchAll(new RegExp(`<${landmark}(?:\\s|>)`, "gi"))].length;
+    if (count !== 1) errors.push(`${name}: expected exactly one ${landmark} landmark; found ${count}`);
+  }
 
   const skipLink = [...source.matchAll(/<a\b[^>]*>/gi)].find((match) => hasClass(match[0], "skip-link"));
   if (!skipLink) {
@@ -279,6 +304,9 @@ const htmlFiles = files.filter((file) => file.endsWith(".html"));
 const allRelative = new Set(files.map(relative));
 const sitemapPath = path.join(root, "sitemap.xml");
 const sitemap = allRelative.has("sitemap.xml") ? await readFile(sitemapPath, "utf8") : "";
+for (const name of ["_headers", "favicon.svg", "robots.txt", "site.webmanifest", "sitemap.xml", "docs/LAUNCH_CHECKLIST.md"]) {
+  if (!allRelative.has(name)) errors.push(`missing required release file: ${name}`);
+}
 const publicPageNames = new Set();
 for (const match of sitemap.matchAll(/<loc>https:\/\/lxephotography\.com([^<]*)<\/loc>/g)) {
   const route = match[1] || "/";
@@ -305,6 +333,25 @@ for (const file of htmlFiles) {
   for (const id of new Set(duplicates)) errors.push(`${name}: duplicate id "${id}"`);
 
   if (publicPageNames.has(name)) auditInteractiveMarkup(html, name, { requirePageControls: true });
+
+  if (publicPageNames.has(name)) {
+    const iconLink = [...html.matchAll(/<link\b[^>]*>/gi)].find((match) =>
+      attributeValue(match[0], "rel").toLowerCase().split(/\s+/).includes("icon")
+    );
+    if (!iconLink || !attributeValue(iconLink[0], "href")) errors.push(`${name}: missing favicon reference`);
+
+    const structuredData = jsonLdValues(html, name);
+    if (name === "index.html" && !structuredData.some((value) => schemaTypes(value).includes("ProfessionalService"))) {
+      errors.push(`${name}: missing ProfessionalService structured data`);
+    }
+
+    if (name === "index.html") {
+      const manifestLink = [...html.matchAll(/<link\b[^>]*>/gi)].find((match) =>
+        attributeValue(match[0], "rel").toLowerCase().split(/\s+/).includes("manifest")
+      );
+      if (!manifestLink || !attributeValue(manifestLink[0], "href")) errors.push(`${name}: missing web manifest reference`);
+    }
+  }
 
   for (const match of html.matchAll(/<img\b[^>]*>/gi)) {
     if (!/\salt=["'][^"']*["']/i.test(match[0])) errors.push(`${name}: image missing alt attribute`);
@@ -389,6 +436,10 @@ for (const file of htmlFiles) {
     if (!/\srel=["'][^"']*noopener[^"']*["']/i.test(match[0])) errors.push(`${name}: target=_blank link missing rel=noopener`);
   }
 
+  for (const match of html.matchAll(/<a\b[^>]*\bdownload(?:\s|=|>)[^>]*>/gi)) {
+    if (!attributeValue(match[0], "href")) errors.push(`${name}: download link missing href`);
+  }
+
   for (const match of html.matchAll(/\b(?:src|href)=["']([^"']+)["']/gi)) {
     const target = localTarget(match[1]);
     if (!target) continue;
@@ -446,7 +497,15 @@ for (const name of publicImageTemplateFiles) {
 }
 
 for (const name of ["payment-ready.js", "gallery-portal.js"]) {
-  auditInteractiveMarkup(await readFile(path.join(root, name), "utf8"), name);
+  const source = await readFile(path.join(root, name), "utf8");
+  auditInteractiveMarkup(source, name);
+  if (name === "gallery-portal.js") {
+    const downloads = [...source.matchAll(/<a\b[^>]*\bdownload(?:\s|=|>)[^>]*>/gi)];
+    if (!downloads.length) errors.push(`${name}: missing client photograph download link`);
+    for (const match of downloads) {
+      if (!attributeValue(match[0], "href")) errors.push(`${name}: download link missing href`);
+    }
+  }
 }
 
 const titles = new Map();
@@ -551,6 +610,87 @@ if (allRelative.has("robots.txt")) {
   if (!/^Sitemap:\s*https:\/\/lxephotography\.com\/sitemap\.xml\s*$/im.test(robots)) {
     errors.push("robots.txt: missing production sitemap declaration");
   }
+}
+
+if (allRelative.has("site.webmanifest")) {
+  const manifestPath = path.join(root, "site.webmanifest");
+  let manifest;
+  try {
+    manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  } catch (error) {
+    errors.push(`site.webmanifest: invalid JSON (${error.message})`);
+  }
+  if (manifest) {
+    if (!manifest.name || !manifest.start_url) errors.push("site.webmanifest: missing name or start_url");
+    if (!Array.isArray(manifest.icons) || !manifest.icons.length) {
+      errors.push("site.webmanifest: missing icons");
+    } else {
+      for (const icon of manifest.icons) {
+        if (!icon.src || !(await targetExists(manifestPath, icon.src))) {
+          errors.push(`site.webmanifest: missing icon target ${icon.src || "(empty)"}`);
+        }
+      }
+    }
+  }
+}
+
+if (allRelative.has("_headers")) {
+  const headerLines = (await readFile(path.join(root, "_headers"), "utf8")).split(/\r?\n/);
+  const wildcardIndex = headerLines.findIndex((line) => line.trim() === "/*");
+  const wildcardHeaders = new Map();
+  if (wildcardIndex < 0) errors.push("_headers: missing wildcard security-header block");
+  for (const line of headerLines.slice(wildcardIndex + 1)) {
+    if (!line.trim()) break;
+    const match = line.match(/^\s+([^:]+):\s*(.+)$/);
+    if (match) wildcardHeaders.set(match[1].trim().toLowerCase(), match[2].trim());
+  }
+
+  for (const header of [
+    "content-security-policy",
+    "strict-transport-security",
+    "referrer-policy",
+    "permissions-policy",
+    "x-content-type-options",
+    "x-frame-options"
+  ]) {
+    if (!wildcardHeaders.has(header)) errors.push(`_headers: missing ${header}`);
+  }
+
+  const csp = wildcardHeaders.get("content-security-policy") || "";
+  for (const directive of ["default-src", "script-src", "connect-src", "img-src", "style-src", "form-action", "base-uri", "frame-ancestors"]) {
+    if (!new RegExp(`(?:^|;)\\s*${escapeRegExp(directive)}\\b`, "i").test(csp)) {
+      errors.push(`_headers: Content-Security-Policy missing ${directive}`);
+    }
+  }
+  if (!csp.includes("https://static.cloudflareinsights.com")) {
+    errors.push("_headers: CSP must explicitly allow the configured Cloudflare Web Analytics script");
+  }
+  if (!csp.includes("https://cloudflareinsights.com")) {
+    errors.push("_headers: CSP must explicitly allow the configured Cloudflare Web Analytics connection");
+  }
+
+  if ((wildcardHeaders.get("x-content-type-options") || "").toLowerCase() !== "nosniff") {
+    errors.push("_headers: X-Content-Type-Options must be nosniff");
+  }
+  if ((wildcardHeaders.get("x-frame-options") || "").toUpperCase() !== "DENY") {
+    errors.push("_headers: X-Frame-Options must be DENY");
+  }
+  if (!/\bmax-age=\d+/i.test(wildcardHeaders.get("strict-transport-security") || "")) {
+    errors.push("_headers: Strict-Transport-Security must define max-age");
+  }
+}
+
+const workerSource = await readFile(path.join(root, "src", "worker.js"), "utf8");
+for (const header of [
+  "Content-Security-Policy",
+  "Strict-Transport-Security",
+  "Referrer-Policy",
+  "Permissions-Policy",
+  "X-Content-Type-Options",
+  "X-Frame-Options",
+  "X-Robots-Tag"
+]) {
+  if (!workerSource.includes(`"${header}"`)) errors.push(`src/worker.js: missing ${header} handling`);
 }
 
 const studioHtml = await readFile(path.join(root, "studio", "index.html"), "utf8");

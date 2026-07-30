@@ -40,8 +40,8 @@ const PUBLIC_HTML_CSP = [
   "img-src 'self' data: blob:",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src https://fonts.gstatic.com",
-  "script-src 'self' 'unsafe-inline'",
-  "connect-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
+  "connect-src 'self' https://cloudflareinsights.com",
   "form-action 'self' mailto:"
 ].join("; ");
 
