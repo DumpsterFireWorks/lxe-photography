@@ -38,6 +38,7 @@ const expectedLcpImages = new Map([
   ["portfolio/couples-engagements/index.html", "/public/images/portfolio/couples-beach-shore-kiss.jpg"],
   ["portfolio/portraits-seniors/index.html", "/portfolio/04-seated-blue-dress-portrait.jpeg"],
   ["portfolio/motherhood-newborns/index.html", "/portfolio/motherhood-newborns/IMG_8924.jpeg"],
+  ["portfolio/minis-seasonal/index.html", "/public/images/portfolio/seasonal/back-to-school-chair-books.jpg"],
   ["about/index.html", "/public/images/DEEDF45C-371D-4B9C-AA58-03638A48D338.png"]
 ]);
 const publicImageTemplateFiles = ["payment-ready.js", "portfolio-additions.js"];
