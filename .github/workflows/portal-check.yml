@@ -8,7 +8,6 @@ on:
       - "client-galleries/**"
       - "**/*.html"
       - "**/*.css"
-      - "homepage-hero.js"
       - "script.js"
       - "payment-ready.js"
       - "gallery-portal.*"
