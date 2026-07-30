@@ -8,6 +8,7 @@ on:
       - "client-galleries/**"
       - "**/*.html"
       - "**/*.css"
+      - "homepage-hero.js"
       - "script.js"
       - "payment-ready.js"
       - "gallery-portal.*"
@@ -42,7 +43,7 @@ jobs:
       - name: Check JavaScript syntax
         run: npm run check
 
-      - name: Audit static website
+      - name: Static website audit
         run: npm run audit
 
       - name: Build Worker bundle
