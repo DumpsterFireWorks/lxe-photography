@@ -1,0 +1,52 @@
+name: Align homepage hero audit
+
+on:
+  push:
+    branches:
+      - "homepage/scheduled-hero-rotation"
+    paths:
+      - ".github/workflows/fix-homepage-hero-audit.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  align:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out hero branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Align homepage LCP audit with the visible couples fallback
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/scripts/site-audit.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = '["index.html", "/public/images/portfolio/family-beach-lift.jpg"]'
+          new = '["index.html", "/public/images/portfolio/couples-beach-shore-kiss.jpg"]'
+          if old not in text:
+              raise SystemExit('Expected homepage LCP audit entry was not found')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Remove this one-time workflow
+        run: rm .github/workflows/fix-homepage-hero-audit.yml
+
+      - name: Run verification
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+          npm run verify
+          git diff --check
+
+      - name: Commit audit alignment
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Align homepage audit with couples hero fallback"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
