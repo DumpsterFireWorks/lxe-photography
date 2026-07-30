@@ -1,13 +1,15 @@
 {
   "name": "lxe-photography",
   "private": true,
+  "type": "module",
   "version": "1.2.0",
   "scripts": {
     "deploy": "wrangler deploy",
     "preview": "wrangler dev --test-scheduled",
     "check": "node --check script.js && node --check payment-ready.js && node --check client-galleries/client-galleries.js && node --check src/entry.js && node --check src/worker.js && node --check src/gallery-schema.js && node --check src/gallery-portal.js && node --check studio/studio.js && node --check gallery-portal.js",
+    "test": "node --test tests/*.test.js",
     "audit": "node .github/scripts/site-audit.mjs",
-    "verify": "npm run check && npm run audit && wrangler deploy --dry-run",
+    "verify": "npm run check && npm test && npm run audit && wrangler deploy --dry-run",
     "gallery:db:create": "wrangler d1 create lxe-client-galleries",
     "gallery:bucket:create": "wrangler r2 bucket create lxe-client-galleries",
     "gallery:migrate": "wrangler d1 migrations apply GALLERY_DB --remote"
