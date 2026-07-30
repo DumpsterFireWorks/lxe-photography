@@ -6,12 +6,12 @@
   const heroes = [
     {
       id: "couples",
-      src: "/public/images/portfolio/couples-beach-embrace-close.jpg",
-      alt: "Couple embracing outdoors near the Lake Michigan shoreline",
-      width: 1536,
-      height: 1024,
-      desktopPosition: "50% 45%",
-      mobilePosition: "58% 50%"
+      src: "/public/images/portfolio/couples-beach-shore-kiss.jpg",
+      alt: "Couple embracing beside the Lake Michigan shoreline",
+      width: 1024,
+      height: 1280,
+      desktopPosition: "50% 48%",
+      mobilePosition: "50% 42%"
     },
     {
       id: "portraits",
@@ -61,7 +61,7 @@
     const slot = document.getElementById(slotId);
     if (!slot) return false;
 
-    const image = document.createElement("img");
+    const image = slot instanceof HTMLImageElement ? slot : document.createElement("img");
     image.className = "hero-image";
     image.src = activeHero.src;
     image.alt = activeHero.alt;
@@ -73,7 +73,8 @@
     image.dataset.hero = activeHero.id;
     image.style.setProperty("--hero-desktop-position", activeHero.desktopPosition);
     image.style.setProperty("--hero-mobile-position", activeHero.mobilePosition);
-    slot.replaceWith(image);
+
+    if (image !== slot) slot.replaceWith(image);
     return true;
   }
 
