@@ -92,7 +92,14 @@ Lighthouse 13.4.1 spot checks against the current production homepage measured:
 - Mobile: Performance 90, Accessibility 100, SEO 100, Best Practices 92, LCP 2.9 s, CLS 0, TBT 0 ms.
 - Desktop: Performance 100, Accessibility 100, SEO 100, Best Practices 92, LCP 0.6 s, CLS 0.001, TBT 0 ms.
 
-The Best Practices reduction was caused by the Cloudflare Web Analytics script being blocked by the public CSP. Milestone 4A applies Cloudflare's narrowly scoped documented script and connection allowlists. Final preview observations must be recorded in the pull request before merge; these production measurements are not a claim of improvement on an undeployed change.
+The Best Practices reduction was caused by the Cloudflare Web Analytics script being blocked by the public CSP. Milestone 4A applies Cloudflare's narrowly scoped documented script and connection allowlists. These production measurements are the release baseline, not a claim of improvement on an undeployed change.
+
+The Cloudflare branch preview measured:
+
+- Mobile: Performance 98, Accessibility 100, Best Practices 100, LCP 2.1 s, CLS 0, TBT 0 ms.
+- Desktop: Performance 100, Accessibility 100, Best Practices 100, LCP 0.5 s, CLS 0.001, TBT 0 ms.
+
+The preview's SEO score was 69 because Cloudflare correctly sends `X-Robots-Tag: noindex` on branch previews. Preview timing can differ from production, so these measurements confirm the absence of a regression and the corrected Best Practices finding rather than a guaranteed production performance improvement.
 
 ### Security headers
 
@@ -115,7 +122,13 @@ Production read-only checks confirmed `X-Robots-Tag: noindex, nofollow, noarchiv
 
 ### GitHub CI and Cloudflare preview build
 
-Record the final GitHub validation result, Cloudflare build result, branch preview URL, and inspected commit in the Milestone 4A pull request. No production deployment is authorized by this checklist.
+GitHub's `validate` workflow and the Cloudflare Workers build passed for the Milestone 4A branch.
+
+Branch preview:
+
+`https://release-milestone-4a-launch-readiness-lxe-photography.chris-5a6.workers.dev`
+
+The preview was inspected across all sitemap routes in Edge and Chrome. It had no status failures, broken images, failed requests, horizontal overflow, console errors, or axe violations. The public CSP allowed a controlled Cloudflare Web Analytics script probe without a violation, all required security headers remained present, and Studio, gallery, API, source, and documentation routes remained `noindex`. No production deployment was performed.
 
 ## Manual owner tasks before or shortly after launch
 
