@@ -128,6 +128,102 @@ function titleValue(html) {
   return match ? decodeHtml(match[1].trim()) : "";
 }
 
+function hasClass(tag, name) {
+  return attributeValue(tag, "class").split(/\s+/).includes(name);
+}
+
+function plainText(fragment) {
+  return decodeHtml(fragment.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim());
+}
+
+function hasAccessibleName(tag, content = "") {
+  if (attributeValue(tag, "aria-label") || attributeValue(tag, "aria-labelledby")) return true;
+  if (plainText(content)) return true;
+  return [...content.matchAll(/<img\b[^>]*>/gi)].some((match) => attributeValue(match[0], "alt"));
+}
+
+function isWrappedByLabel(source, index) {
+  const before = source.slice(0, index).toLowerCase();
+  return before.lastIndexOf("<label") > before.lastIndexOf("</label>");
+}
+
+function auditInteractiveMarkup(source, name, { requirePageControls = false } = {}) {
+  const ids = new Set([...source.matchAll(/\sid=["']([^"']+)["']/gi)].map((match) => match[1]));
+
+  for (const match of source.matchAll(/<[a-z][^>]*>/gi)) {
+    for (const attribute of ["aria-labelledby", "aria-describedby", "aria-controls"]) {
+      const references = attributeValue(match[0], attribute);
+      if (!references) continue;
+      for (const reference of references.split(/\s+/)) {
+        if (!ids.has(reference)) errors.push(`${name}: ${attribute} references missing id "${reference}"`);
+      }
+    }
+  }
+
+  for (const match of source.matchAll(/<(input|select|textarea)\b[^>]*>/gi)) {
+    const tag = match[0];
+    if (match[1].toLowerCase() === "input" && attributeValue(tag, "type").toLowerCase() === "hidden") continue;
+    if (attributeValue(tag, "aria-hidden").toLowerCase() === "true") continue;
+    const id = attributeValue(tag, "id");
+    const explicitLabel = id && new RegExp(`<label\\b[^>]*\\bfor=["']${escapeRegExp(id)}["']`, "i").test(source);
+    const wrappedLabel = isWrappedByLabel(source, match.index);
+    const namedInput = ["button", "submit", "reset"].includes(attributeValue(tag, "type").toLowerCase()) && attributeValue(tag, "value");
+    if (!attributeValue(tag, "aria-label") && !attributeValue(tag, "aria-labelledby") && !explicitLabel && !wrappedLabel && !namedInput) {
+      errors.push(`${name}: ${match[1].toLowerCase()} ${id || attributeValue(tag, "name") || "(unnamed)"} is missing an accessible name`);
+    }
+  }
+
+  for (const match of source.matchAll(/<button\b[^>]*>([\s\S]*?)<\/button>/gi)) {
+    if (!hasAccessibleName(match[0].slice(0, match[0].indexOf(">") + 1), match[1])) {
+      errors.push(`${name}: button is missing discernible text or an accessible name`);
+    }
+  }
+
+  for (const match of source.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gi)) {
+    if (!hasAccessibleName(match[0].slice(0, match[0].indexOf(">") + 1), match[1])) {
+      errors.push(`${name}: link is missing discernible text or an accessible name`);
+    }
+  }
+
+  for (const match of source.matchAll(/<summary\b[^>]*>([\s\S]*?)<\/summary>/gi)) {
+    if (!hasAccessibleName(match[0].slice(0, match[0].indexOf(">") + 1), match[1])) {
+      errors.push(`${name}: disclosure summary is missing an accessible name`);
+    }
+  }
+
+  for (const match of source.matchAll(/<[a-z][^>]*\brole=["']status["'][^>]*>/gi)) {
+    if (!["polite", "assertive"].includes(attributeValue(match[0], "aria-live").toLowerCase())) {
+      errors.push(`${name}: status element must declare a polite or assertive live region`);
+    }
+  }
+
+  if (!requirePageControls) return;
+
+  const skipLink = [...source.matchAll(/<a\b[^>]*>/gi)].find((match) => hasClass(match[0], "skip-link"));
+  if (!skipLink) {
+    errors.push(`${name}: missing skip link`);
+  } else {
+    const target = attributeValue(skipLink[0], "href").replace(/^#/, "");
+    if (!target || !ids.has(target)) errors.push(`${name}: skip link must reference an existing id`);
+  }
+
+  const menuButton = [...source.matchAll(/<button\b[^>]*>/gi)].find((match) => hasClass(match[0], "menu-button"));
+  if (!menuButton) {
+    errors.push(`${name}: missing mobile menu button`);
+  } else {
+    const controls = attributeValue(menuButton[0], "aria-controls");
+    if (attributeValue(menuButton[0], "type").toLowerCase() !== "button") errors.push(`${name}: mobile menu control must be type=button`);
+    if (attributeValue(menuButton[0], "aria-expanded").toLowerCase() !== "false") errors.push(`${name}: mobile menu must start collapsed`);
+    if (!controls || !ids.has(controls)) errors.push(`${name}: mobile menu control must reference an existing navigation id`);
+    if (!attributeValue(menuButton[0], "aria-label")) errors.push(`${name}: mobile menu control is missing an accessible name`);
+  }
+
+  const announcement = [...source.matchAll(/<[a-z][^>]*>/gi)].find((match) => hasClass(match[0], "announcement"));
+  if (announcement && (attributeValue(announcement[0], "role") !== "region" || !attributeValue(announcement[0], "aria-label"))) {
+    errors.push(`${name}: announcement must be contained in a named region`);
+  }
+}
+
 async function imageDimensions(file) {
   const buffer = await readFile(file);
 
@@ -207,6 +303,8 @@ for (const file of htmlFiles) {
   const ids = [...html.matchAll(/\sid=["']([^"']+)["']/gi)].map((match) => match[1]);
   const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
   for (const id of new Set(duplicates)) errors.push(`${name}: duplicate id "${id}"`);
+
+  if (publicPageNames.has(name)) auditInteractiveMarkup(html, name, { requirePageControls: true });
 
   for (const match of html.matchAll(/<img\b[^>]*>/gi)) {
     if (!/\salt=["'][^"']*["']/i.test(match[0])) errors.push(`${name}: image missing alt attribute`);
@@ -347,6 +445,10 @@ for (const name of publicImageTemplateFiles) {
   }
 }
 
+for (const name of ["payment-ready.js", "gallery-portal.js"]) {
+  auditInteractiveMarkup(await readFile(path.join(root, name), "utf8"), name);
+}
+
 const titles = new Map();
 const descriptions = new Map();
 const canonicals = new Map();
@@ -485,3 +587,4 @@ if (errors.length) {
 }
 
 console.log(`\nSite audit passed: ${htmlFiles.length} HTML files and ${files.length} repository files checked.`);
+console.log("Structural accessibility checks do not replace manual WCAG or assistive-technology review.");

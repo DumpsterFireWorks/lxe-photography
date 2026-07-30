@@ -29,7 +29,7 @@
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <div class="announcement">Private photo delivery · Secure gallery access</div>
+  <div class="announcement" role="region" aria-label="Site announcement">Private photo delivery · Secure gallery access</div>
   <header class="site-header">
     <a class="brand" href="/" aria-label="LXE Photography home"><span class="brand-mark">LXE</span><span class="brand-sub">PHOTOGRAPHY</span></a>
     <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation"><span></span><span></span><span></span></button>
@@ -44,7 +44,7 @@
         <p>Enter the gallery code and four-digit PIN included in the message from Lexus. Both are required to protect your photographs.</p>
         <div class="client-access-help">
           <p><strong>Where is my gallery code?</strong></p>
-          <p>It is the last part of your private link. You may also paste the complete gallery link into the box.</p>
+          <p id="gallery-code-help">It is the last part of your private link. You may also paste the complete gallery link into the box.</p>
           <p class="client-code-example">Example: <span>smith-family</span></p>
         </div>
       </div>
@@ -52,16 +52,16 @@
       <section class="client-access-card" aria-labelledby="access-title">
         <p class="eyebrow">Open my gallery</p>
         <h2 id="access-title">Welcome back.</h2>
-        <form id="gallery-access-form" class="client-access-form">
+        <form id="gallery-access-form" class="client-access-form" aria-labelledby="access-title">
           <label for="gallery-code">Gallery code or complete gallery link</label>
-          <input id="gallery-code" name="galleryCode" type="text" maxlength="240" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="smith-family" required />
+          <input id="gallery-code" name="galleryCode" type="text" maxlength="240" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="smith-family" aria-describedby="gallery-code-help gallery-access-status" required />
 
           <label for="gallery-pin">Four-digit PIN</label>
-          <input id="gallery-pin" name="pin" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{4}" maxlength="4" placeholder="0000" required />
+          <input id="gallery-pin" name="pin" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{4}" maxlength="4" placeholder="0000" aria-describedby="gallery-access-status" required />
 
           <button class="button button-dark" type="submit">Open my photographs</button>
         </form>
-        <p id="gallery-access-status" class="gallery-access-status" role="status" aria-live="polite"></p>
+        <p id="gallery-access-status" class="gallery-access-status" role="status" aria-live="polite" aria-atomic="true"></p>
         <p class="client-access-contact">Missing your link or PIN? <a href="mailto:hello@lxephotography.com">Contact LXE Photography</a>.</p>
       </section>
     </section>

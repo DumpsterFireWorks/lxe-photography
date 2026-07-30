@@ -85,7 +85,7 @@ function renderPin() {
       <label>Four-digit gallery PIN<input id="pin-input" name="pin" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{4}" maxlength="4" required autofocus /></label>
       <button class="primary-button" type="submit">Open my photos</button>
     </form>
-    <p id="pin-status" class="status" role="status" aria-live="polite"></p>
+    <p id="pin-status" class="status" role="status" aria-live="polite" aria-atomic="true"></p>
   </section>`;
 
   const form = document.querySelector("#pin-form");
@@ -121,13 +121,13 @@ function renderGallery() {
       <p>Prepared for <strong>${escapeHtml(gallery.clientName)}</strong> by LXE Photography.</p>
       <p>${photos.length} photograph${photos.length === 1 ? "" : "s"} · Available until ${formatDate(gallery.expiresAt)} · ${remaining} day${remaining === 1 ? "" : "s"} remaining</p>
       <div class="gallery-actions"><button id="download-all" class="primary-button" type="button">Download all as ZIP</button><a class="secondary-button" href="mailto:hello@lxephotography.com">Contact Lexus</a></div>
-      <div id="download-progress" class="download-progress" hidden><div><span id="download-label">Preparing your ZIP file…</span><strong id="download-count"></strong></div><progress id="download-bar" max="100" value="0"></progress></div>
+      <div id="download-progress" class="download-progress" role="status" aria-live="polite" aria-atomic="true" hidden><div><span id="download-label">Preparing your ZIP file…</span><strong id="download-count"></strong></div><progress id="download-bar" max="100" value="0" aria-labelledby="download-label download-count"></progress></div>
     </div>
   </section>
   ${photos.length ? `<section class="client-grid" aria-label="Client photographs">${photos.map((photo, index) => `<figure class="client-photo">
     <img src="${photo.viewUrl}" alt="Photograph ${index + 1} from ${escapeHtml(gallery.title)}" loading="${index < 2 ? "eager" : "lazy"}" decoding="async" />
     <span class="photo-number">${String(index + 1).padStart(2, "0")}</span>
-    <div class="photo-actions"><a class="view-button" href="${photo.viewUrl}" target="_blank" rel="noopener noreferrer">View full size</a><a class="download-button" href="${photo.downloadUrl}" download="${escapeHtml(photo.originalName)}">Download</a></div>
+    <div class="photo-actions"><a class="view-button" href="${photo.viewUrl}" target="_blank" rel="noopener noreferrer" aria-label="View photograph ${index + 1} full size in a new tab">View full size</a><a class="download-button" href="${photo.downloadUrl}" download="${escapeHtml(photo.originalName)}" aria-label="Download photograph ${index + 1}: ${escapeHtml(photo.originalName)}">Download</a></div>
   </figure>`).join("")}</section>` : '<section class="empty-gallery"><p>Your photographer is still preparing this gallery.</p></section>'}`;
 
   document.querySelector("#download-all")?.addEventListener("click", downloadAllAsZip);
