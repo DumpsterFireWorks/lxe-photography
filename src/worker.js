@@ -1,7 +1,7 @@
 import { cleanupExpiredGalleries, handleGalleryApi, handleGalleryPage } from "./gallery-portal.js";
 
-const INQUIRY_DESTINATION = "lynnlexus421@gmail.com";
 const PUBLIC_EMAIL = "hello@lxephotography.com";
+const INQUIRY_DESTINATION = PUBLIC_EMAIL;
 const EMAIL_FROM = "hello@lxephotography.com";
 const INQUIRY_WINDOW_MS = 15 * 60 * 1000;
 const INQUIRY_MAX_ATTEMPTS = 5;
@@ -59,6 +59,13 @@ function clean(value, maxLength = 500) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
+function cleanHeaderValue(value, maxLength = 200) {
+  return clean(value, maxLength)
+    .replace(/[\u0000-\u001f\u007f]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function escapeHtml(value) {
   return clean(value, 3000)
     .replaceAll("&", "&amp;")
@@ -69,7 +76,7 @@ function escapeHtml(value) {
 }
 
 function buildMailto(data) {
-  const subject = encodeURIComponent(`LXE Photography inquiry — ${data.session}`);
+  const subject = encodeURIComponent(`LXE Photography inquiry — ${cleanHeaderValue(data.session, 80)}`);
   const body = encodeURIComponent(
     [
       `Name: ${data.name}`,
@@ -230,13 +237,24 @@ async function enforceInquiryRateLimit(request, env) {
 
 async function handleInquiry(request, env) {
   if (request.method !== "POST") return json({ ok: false, error: "Method not allowed." }, 405);
+  const contentType = (request.headers.get("Content-Type") || "").split(";", 1)[0].trim().toLowerCase();
+  if (contentType !== "application/json") {
+    return json({ ok: false, error: "Unsupported request format." }, 415);
+  }
   const contentLength = Number(request.headers.get("Content-Length") || "0");
   if (contentLength > 12_000) return json({ ok: false, error: "Request is too large." }, 413);
 
   let body;
   try {
-    body = await request.json();
+    const rawBody = await request.text();
+    if (encoder.encode(rawBody).byteLength > 12_000) {
+      return json({ ok: false, error: "Request is too large." }, 413);
+    }
+    body = JSON.parse(rawBody);
   } catch {
+    return json({ ok: false, error: "Invalid request." }, 400);
+  }
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
     return json({ ok: false, error: "Invalid request." }, 400);
   }
 
@@ -281,6 +299,7 @@ async function handleInquiry(request, env) {
     `Preferred time: ${data.preferredTime || "Flexible"}`,
     `Alternate date: ${data.alternateDate || "Not provided"}`,
     `Page: ${data.page || "Not provided"}`,
+    "Booking acknowledgement: Confirmed",
     "",
     "Message:",
     data.message
@@ -296,6 +315,8 @@ async function handleInquiry(request, env) {
       <tr><td><strong>Preferred date</strong></td><td>${escapeHtml(data.preferredDate || "Flexible")}</td></tr>
       <tr><td><strong>Preferred time</strong></td><td>${escapeHtml(data.preferredTime || "Flexible")}</td></tr>
       <tr><td><strong>Alternate date</strong></td><td>${escapeHtml(data.alternateDate || "Not provided")}</td></tr>
+      <tr><td><strong>Page</strong></td><td>${escapeHtml(data.page || "Not provided")}</td></tr>
+      <tr><td><strong>Booking acknowledgement</strong></td><td>Confirmed</td></tr>
     </table>
     <h2>Message</h2>
     <p>${escapeHtml(data.message).replaceAll("\n", "<br>")}</p>`;
@@ -304,14 +325,14 @@ async function handleInquiry(request, env) {
     await env.EMAIL.send({
       to: INQUIRY_DESTINATION,
       from: { email: EMAIL_FROM, name: "LXE Photography Website" },
-      replyTo: { email: data.email, name: data.name },
-      subject: `New inquiry — ${data.session}`,
+      replyTo: { email: data.email, name: cleanHeaderValue(data.name, 100) },
+      subject: `New LXE Photography inquiry — ${cleanHeaderValue(data.session, 80)}`,
       text,
       html
     });
     return json({ ok: true });
-  } catch (error) {
-    console.error("Inquiry email failed", error?.code, error?.message);
+  } catch {
+    console.error("Inquiry email delivery failed.");
     return json({ ok: false, error: "The website could not deliver the inquiry.", fallbackUrl }, 502);
   }
 }

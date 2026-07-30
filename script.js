@@ -189,19 +189,25 @@ function buildInquiryBody(data) {
 }
 
 function buildMailto(data) {
-  const subject = encodeURIComponent(`LXE Photography inquiry — ${data.session}`);
+  const safeSession = String(data.session || "").replace(/[\r\n]+/g, " ").trim();
+  const subject = encodeURIComponent(`LXE Photography inquiry — ${safeSession}`);
   const body = encodeURIComponent(buildInquiryBody(data));
   return `mailto:${businessEmail}?subject=${subject}&body=${body}`;
 }
 
+let inquirySubmissionPending = false;
+
 contactForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  if (inquirySubmissionPending) return;
 
   if (!contactForm.checkValidity()) {
     contactForm.reportValidity();
     return;
   }
 
+  inquirySubmissionPending = true;
   const formData = new FormData(contactForm);
   const payload = Object.fromEntries(formData.entries());
   payload.page = `${window.location.origin}${window.location.pathname}`;
@@ -236,6 +242,7 @@ contactForm?.addEventListener("submit", async (event) => {
     window.location.href = buildMailto(payload);
     setFormStatus("Your email app should open with the inquiry ready. Review it and press send.", "success");
   } finally {
+    inquirySubmissionPending = false;
     submitButton?.removeAttribute("disabled");
   }
 });

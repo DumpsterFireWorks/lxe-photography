@@ -6,18 +6,40 @@ The current release candidate has a strong technical baseline: all 15 routes in 
 
 Milestone 4A verified the repository audit, the current production site, real Edge and Chrome rendering, responsive layouts, keyboard workflows, security headers, production indexing controls, and mobile and desktop Lighthouse spot checks. It also corrected a public Content Security Policy mismatch that blocked Cloudflare's automatically injected Web Analytics beacon and produced a browser console error.
 
-The Milestone 4A change is suitable to merge after code review and successful CI/Cloudflare preview verification. The website should not receive final launch sign-off until the manual owner tasks below are complete. In particular, draft PR #32 still owns the visible portfolio breadcrumbs and `BreadcrumbList` JSON-LD requested by Milestone 2B, and Issue #6 still tracks a real end-to-end inquiry delivery test.
+The Milestone 4A change is suitable to merge after code review and successful CI/Cloudflare preview verification. The website should not receive final launch sign-off until the manual owner tasks below are complete. Milestone 2B recovery is now merged, and direct inquiry receipt is owner-confirmed in production.
 
 Known limitations:
 
 - Physical Safari, a physical iPhone, VoiceOver, and true 200% browser zoom were not available in this Windows environment.
-- No production inquiry was submitted, so arrival at `hello@lxephotography.com`, Reply-To behavior, and production spam handling remain owner checks.
+- Production receipt at `hello@lxephotography.com` is owner-confirmed. Production Reply-To and spam-folder behavior were not separately confirmed in Milestone 4B.
 - No real client gallery was unlocked or downloaded.
-- Draft PR #32 is not merged, so `main` does not yet contain its visible portfolio breadcrumbs or `BreadcrumbList` structured data.
 - The About portrait is approximately 4.1 MB and another public portfolio image is approximately 2.8 MB. Reducing those bytes requires a separately authorized image-processing task.
 - Wrangler 4.114 on Windows crashed its disposable local proxy when a D1-backed inquiry-rate-limit request was attempted. Non-mutating method, honeypot, and size guards were verified locally; deeper D1-backed behavior remains covered by source review, CI, and the required owner test.
 
 No manual production deployment was performed in Milestone 4A.
+
+## Direct inquiry status
+
+Direct inquiry delivery is enabled through the existing destination-restricted `EMAIL` binding. The Worker sends validated inquiries to `hello@lxephotography.com` and uses the validated prospective-client email as Reply-To. The owner confirmed that production receipt is working; the date of the latest live test was not supplied. Reply-To is confirmed by implementation review and mocked delivery tests, but was not independently confirmed in the production inbox during Milestone 4B. Missing-binding and send-failure fallbacks were verified with mocked responses and browser QA. No new production inquiry was sent during this task.
+
+Operational behavior:
+
+- **Direct-delivery success:** the endpoint returns success, the form announces that the inquiry was sent, resets, and does not open the visitor's mail application.
+- **Validation failure:** the endpoint returns a customer-readable validation error; the form retains the inquiry details and restores the submit button.
+- **Rate limiting:** the endpoint returns a 15-minute wait message without attempting delivery.
+- **Binding unavailable:** the endpoint returns a prepared `mailto:` fallback containing the visitor's inquiry details.
+- **Send failure:** the endpoint returns the same safe fallback without exposing the provider error, stack trace, binding details, or secrets.
+- **Mail-app fallback:** the form opens the prepared message, announces that the visitor must review it and press send, and restores the submit button.
+
+Safe troubleshooting:
+
+1. Confirm the response shown beside the browser form.
+2. Check the Lexus inbox and spam folder.
+3. Confirm the `EMAIL` binding still exists.
+4. Confirm the destination remains authorized.
+5. Inspect Worker logs without copying personal inquiry contents.
+6. Test only with clearly fake data.
+7. Open a focused GitHub issue for any defect.
 
 ## Completed technical checks
 
@@ -51,7 +73,7 @@ Internal links and fragment targets passed the repository audit. Mobile navigati
 
 Required native validation focused the first invalid field. Preferred and alternate dates used the current local minimum and rejected a past date. Mocked browser responses verified the success message, error message, polite atomic live region, form reset after success, and re-enabled submit button after success or failure. The Worker method guard returned 405, the honeypot returned a neutral 200 without delivery, and the request-size guard returned 413 in the disposable local runtime.
 
-The mail delivery architecture was not changed. No production inquiry was submitted.
+Milestone 4B preserved the direct-delivery and mail-app fallback architecture. Production receipt is owner-confirmed; all delivery tests in this task were mocked, and no new production inquiry was submitted.
 
 ### Client Galleries behavior
 
@@ -67,7 +89,7 @@ The audit verified unique titles, descriptions, and canonical URLs for the major
 
 ### Structured data and breadcrumbs
 
-The homepage `ProfessionalService` JSON-LD parsed successfully and remains the established business structured data. JSON-LD encountered during the audit parsed without errors. Visible portfolio breadcrumbs and `BreadcrumbList` JSON-LD remain a prerequisite owned by draft PR #32; they were not duplicated in Milestone 4A.
+The homepage `ProfessionalService` JSON-LD parsed successfully and remains the established business structured data. JSON-LD encountered during the audit parsed without errors. Visible portfolio breadcrumbs and matching `BreadcrumbList` JSON-LD are present following the merged Milestone 2B recovery work.
 
 ### Social sharing metadata
 
@@ -136,9 +158,8 @@ The preview was inspected across all sitemap routes in Edge and Chrome. It had n
 - Test the live site in Safari.
 - Test primary workflows with VoiceOver.
 - Confirm true 200% browser zoom behavior.
-- Confirm the production inquiry email reaches `hello@lxephotography.com`.
+- Confirm production Reply-To behavior and periodically recheck delivery to `hello@lxephotography.com` with clearly fake test data.
 - Confirm a real client gallery can be opened and downloaded using a test gallery owned by LXE Photography.
-- Review and merge the approved breadcrumb and `BreadcrumbList` work from draft PR #32, or complete an equivalent focused issue, before final SEO sign-off.
 - Connect or verify Google Search Console.
 - Submit `https://lxephotography.com/sitemap.xml`.
 - Connect or verify Bing Webmaster Tools.

@@ -12,6 +12,7 @@ on:
       - "payment-ready.js"
       - "gallery-portal.*"
       - "migrations/**"
+      - "tests/**"
       - "wrangler.jsonc"
       - "package.json"
       - "sitemap.xml"
