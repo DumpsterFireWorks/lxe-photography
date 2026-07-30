@@ -2,7 +2,7 @@ const form = document.querySelector("#gallery-access-form");
 const codeInput = document.querySelector("#gallery-code");
 const pinInput = document.querySelector("#gallery-pin");
 const status = document.querySelector("#gallery-access-status");
-const submitButton = form?.querySelector('button[type="submit"]');
+const gallerySubmitButton = form?.querySelector('button[type="submit"]');
 
 function setStatus(message = "", type = "") {
   if (!status) return;
@@ -52,7 +52,7 @@ form?.addEventListener("submit", async (event) => {
     return;
   }
 
-  submitButton.disabled = true;
+  gallerySubmitButton.disabled = true;
   setStatus("Opening your private gallery…");
 
   try {
@@ -75,6 +75,6 @@ form?.addEventListener("submit", async (event) => {
     setStatus(error.message || "We couldn’t open the gallery. Please try again.", "error");
     pinInput.select();
   } finally {
-    submitButton.disabled = false;
+    gallerySubmitButton.disabled = false;
   }
 });

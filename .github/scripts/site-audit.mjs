@@ -30,6 +30,10 @@ function localTarget(value) {
 }
 
 async function targetExists(sourceFile, target) {
+  return Boolean(await resolveTargetFile(sourceFile, target));
+}
+
+async function resolveTargetFile(sourceFile, target) {
   const decoded = decodeURIComponent(target);
   const base = decoded.startsWith("/") ? root : path.dirname(sourceFile);
   const candidate = path.resolve(base, decoded.replace(/^\/+/, ""));
@@ -42,18 +46,23 @@ async function targetExists(sourceFile, target) {
   for (const possibility of possibilities) {
     try {
       const info = await stat(possibility);
-      if (info.isFile()) return true;
+      if (info.isFile()) return possibility;
       if (info.isDirectory()) {
-        const indexInfo = await stat(path.join(possibility, "index.html"));
-        if (indexInfo.isFile()) return true;
+        const indexPath = path.join(possibility, "index.html");
+        const indexInfo = await stat(indexPath);
+        if (indexInfo.isFile()) return indexPath;
       }
     } catch {}
   }
-  return false;
+  return null;
 }
 
 function matches(content, expression) {
   return expression.test(content);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 const files = await walk(root);
@@ -66,7 +75,9 @@ for (const file of htmlFiles) {
 
   if (!matches(html, /<meta\s+name=["']viewport["']/i)) errors.push(`${name}: missing viewport meta tag`);
   if (!matches(html, /<title>[^<]+<\/title>/i)) errors.push(`${name}: missing non-empty title`);
-  if (!matches(html, /<h1(?:\s|>)/i)) errors.push(`${name}: missing H1`);
+  const h1Count = [...html.matchAll(/<h1(?:\s|>)/gi)].length;
+  if (name === "studio/index.html" && h1Count < 1) errors.push(`${name}: missing H1`);
+  else if (name !== "studio/index.html" && h1Count !== 1) errors.push(`${name}: expected exactly one H1; found ${h1Count}`);
   if (name !== "404.html" && !matches(html, /<meta\s+name=["']description["']/i)) warnings.push(`${name}: missing meta description`);
   if (!["404.html", "studio/index.html"].includes(name) && !matches(html, /<link\s+rel=["']canonical["']/i)) warnings.push(`${name}: missing canonical link`);
 
@@ -86,6 +97,23 @@ for (const file of htmlFiles) {
     const target = localTarget(match[1]);
     if (!target) continue;
     if (!(await targetExists(file, target))) errors.push(`${name}: missing local target ${target}`);
+  }
+
+  for (const match of html.matchAll(/\bhref=["']([^"']+)["']/gi)) {
+    const value = match[1];
+    if (/^[a-z]+:/i.test(value) || value.startsWith("//")) continue;
+    const hashIndex = value.indexOf("#");
+    if (hashIndex < 0) continue;
+    const fragment = decodeURIComponent(value.slice(hashIndex + 1));
+    if (!fragment) continue;
+
+    const target = localTarget(value);
+    const targetFile = target ? await resolveTargetFile(file, target) : file;
+    if (!targetFile) continue;
+    const targetHtml = targetFile === file ? html : await readFile(targetFile, "utf8");
+    if (!new RegExp(`\\bid=["']${escapeRegExp(fragment)}["']`, "i").test(targetHtml)) {
+      errors.push(`${name}: missing fragment target #${fragment} in ${relative(targetFile)}`);
+    }
   }
 }
 
