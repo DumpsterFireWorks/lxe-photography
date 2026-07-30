@@ -22,6 +22,16 @@ const majorPublicPages = new Map([
   ["privacy.html", `${siteOrigin}/privacy.html`]
 ]);
 const privateRoutePrefixes = ["/studio", "/gallery", "/api"];
+const expectedLcpImages = new Map([
+  ["index.html", "/public/images/portfolio/family-beach-lift.jpg"],
+  ["portfolio/index.html", "/public/images/portfolio/family-beach-lift.jpg"],
+  ["portfolio/families/index.html", "/public/images/portfolio/family-beach-lift.jpg"],
+  ["portfolio/couples-engagements/index.html", "/public/images/portfolio/couples-beach-shore-kiss.jpg"],
+  ["portfolio/portraits-seniors/index.html", "/portfolio/04-seated-blue-dress-portrait.jpeg"],
+  ["portfolio/motherhood-newborns/index.html", "/portfolio/motherhood-newborns/IMG_8924.jpeg"],
+  ["about/index.html", "/public/images/DEEDF45C-371D-4B9C-AA58-03638A48D338.png"]
+]);
+const publicImageTemplateFiles = ["payment-ready.js", "portfolio-additions.js"];
 
 async function walk(directory, files = []) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -118,9 +128,69 @@ function titleValue(html) {
   return match ? decodeHtml(match[1].trim()) : "";
 }
 
+async function imageDimensions(file) {
+  const buffer = await readFile(file);
+
+  if (buffer.length >= 24 && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
+    return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+  }
+
+  if (buffer.length >= 4 && buffer[0] === 0xff && buffer[1] === 0xd8) {
+    const startOfFrameMarkers = new Set([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf]);
+    let offset = 2;
+    while (offset + 8 < buffer.length) {
+      if (buffer[offset] !== 0xff) {
+        offset += 1;
+        continue;
+      }
+      while (buffer[offset] === 0xff) offset += 1;
+      const marker = buffer[offset];
+      offset += 1;
+      if (marker === 0xd8 || marker === 0xd9) continue;
+      if (offset + 2 > buffer.length) break;
+      const length = buffer.readUInt16BE(offset);
+      if (length < 2 || offset + length > buffer.length) break;
+      if (startOfFrameMarkers.has(marker)) {
+        return { width: buffer.readUInt16BE(offset + 5), height: buffer.readUInt16BE(offset + 3) };
+      }
+      offset += length;
+    }
+  }
+
+  if (buffer.length >= 30 && buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP") {
+    const format = buffer.toString("ascii", 12, 16);
+    if (format === "VP8X") {
+      return { width: 1 + buffer.readUIntLE(24, 3), height: 1 + buffer.readUIntLE(27, 3) };
+    }
+    if (format === "VP8L" && buffer[20] === 0x2f) {
+      const bits = buffer.readUInt32LE(21);
+      return { width: 1 + (bits & 0x3fff), height: 1 + ((bits >>> 14) & 0x3fff) };
+    }
+    const signature = buffer.indexOf(Buffer.from([0x9d, 0x01, 0x2a]), 20);
+    if (format === "VP8 " && signature >= 0 && signature + 7 <= buffer.length) {
+      return {
+        width: buffer.readUInt16LE(signature + 3) & 0x3fff,
+        height: buffer.readUInt16LE(signature + 5) & 0x3fff
+      };
+    }
+  }
+
+  return null;
+}
+
 const files = await walk(root);
 const htmlFiles = files.filter((file) => file.endsWith(".html"));
 const allRelative = new Set(files.map(relative));
+const sitemapPath = path.join(root, "sitemap.xml");
+const sitemap = allRelative.has("sitemap.xml") ? await readFile(sitemapPath, "utf8") : "";
+const publicPageNames = new Set();
+for (const match of sitemap.matchAll(/<loc>https:\/\/lxephotography\.com([^<]*)<\/loc>/g)) {
+  const route = match[1] || "/";
+  const targetFile = await resolveTargetFile(path.join(root, "index.html"), route);
+  if (targetFile) publicPageNames.add(relative(targetFile));
+}
+const publicImageReferences = new Set();
+const dimensionCache = new Map();
 
 for (const file of htmlFiles) {
   const name = relative(file);
@@ -140,6 +210,81 @@ for (const file of htmlFiles) {
 
   for (const match of html.matchAll(/<img\b[^>]*>/gi)) {
     if (!/\salt=["'][^"']*["']/i.test(match[0])) errors.push(`${name}: image missing alt attribute`);
+  }
+
+  if (publicPageNames.has(name)) {
+    const expectedLcpImage = expectedLcpImages.get(name) || "";
+    const imageSourceCounts = new Map();
+    let highPriorityImages = 0;
+    let foundExpectedLcpImage = false;
+
+    for (const match of html.matchAll(/<img\b[^>]*>/gi)) {
+      const tag = match[0];
+      const src = attributeValue(tag, "src");
+      const loading = attributeValue(tag, "loading").toLowerCase();
+      const fetchpriority = attributeValue(tag, "fetchpriority").toLowerCase();
+      const decoding = attributeValue(tag, "decoding").toLowerCase();
+      const width = attributeValue(tag, "width");
+      const height = attributeValue(tag, "height");
+      const isExpectedLcpImage = src === expectedLcpImage && !foundExpectedLcpImage;
+      const target = localTarget(src);
+      const targetFile = target ? await resolveTargetFile(file, target) : null;
+
+      imageSourceCounts.set(src, (imageSourceCounts.get(src) || 0) + 1);
+      if (loading !== "eager" && loading !== "lazy") errors.push(`${name}: image ${src} has missing or invalid loading value`);
+      if (fetchpriority && !["high", "low", "auto"].includes(fetchpriority)) {
+        errors.push(`${name}: image ${src} has invalid fetchpriority value`);
+      }
+      if (decoding && !["async", "sync", "auto"].includes(decoding)) errors.push(`${name}: image ${src} has invalid decoding value`);
+      if (decoding !== "async") errors.push(`${name}: image ${src} should use asynchronous decoding`);
+      if (!/^[1-9]\d*$/.test(width) || !/^[1-9]\d*$/.test(height)) {
+        errors.push(`${name}: image ${src} must have positive integer width and height attributes`);
+      }
+
+      if (fetchpriority === "high") highPriorityImages += 1;
+      if (isExpectedLcpImage) {
+        foundExpectedLcpImage = true;
+        if (loading !== "eager") errors.push(`${name}: likely LCP image ${src} must load eagerly`);
+        if (fetchpriority !== "high") errors.push(`${name}: likely LCP image ${src} must have high fetch priority`);
+      } else {
+        if (loading === "eager") errors.push(`${name}: below-the-fold image ${src} must not load eagerly`);
+        if (fetchpriority === "high") errors.push(`${name}: only the likely LCP image may have high fetch priority`);
+      }
+
+      if (targetFile) {
+        const targetName = relative(targetFile);
+        publicImageReferences.add(targetName);
+        if (!dimensionCache.has(targetName)) dimensionCache.set(targetName, await imageDimensions(targetFile));
+        const intrinsic = dimensionCache.get(targetName);
+        if (!intrinsic) {
+          errors.push(`${name}: unable to validate intrinsic dimensions for ${src}`);
+        } else if (Number(width) !== intrinsic.width || Number(height) !== intrinsic.height) {
+          errors.push(`${name}: image ${src} dimensions must match ${intrinsic.width}x${intrinsic.height}`);
+        }
+      }
+    }
+
+    if (highPriorityImages > 1) errors.push(`${name}: expected at most one high-priority image; found ${highPriorityImages}`);
+    if (expectedLcpImage && !foundExpectedLcpImage) errors.push(`${name}: missing expected LCP image ${expectedLcpImage}`);
+    for (const [src, count] of imageSourceCounts) {
+      if (count > 1) warnings.push(`${name}: image source ${src} appears ${count} times; verify reuse is intentional and cached`);
+    }
+
+    for (const match of html.matchAll(/<(?:img|source)\b[^>]*\bsrcset=["'][^"']+["'][^>]*>/gi)) {
+      const srcset = attributeValue(match[0], "srcset");
+      for (const candidate of srcset.split(",")) {
+        const [url, descriptor = ""] = candidate.trim().split(/\s+/, 2);
+        if (!url) {
+          errors.push(`${name}: empty responsive image candidate`);
+          continue;
+        }
+        if (descriptor && !/^(?:[1-9]\d*w|(?:\d+(?:\.\d+)?|\.\d+)x)$/.test(descriptor)) {
+          errors.push(`${name}: invalid responsive image descriptor ${descriptor}`);
+        }
+        const target = localTarget(url);
+        if (target && !(await targetExists(file, target))) errors.push(`${name}: missing responsive image target ${target}`);
+      }
+    }
   }
 
   for (const match of html.matchAll(/<a\b[^>]*target=["']_blank["'][^>]*>/gi)) {
@@ -166,6 +311,38 @@ for (const file of htmlFiles) {
     const targetHtml = targetFile === file ? html : await readFile(targetFile, "utf8");
     if (!new RegExp(`\\bid=["']${escapeRegExp(fragment)}["']`, "i").test(targetHtml)) {
       errors.push(`${name}: missing fragment target #${fragment} in ${relative(targetFile)}`);
+    }
+  }
+}
+
+for (const name of publicImageTemplateFiles) {
+  const file = path.join(root, name);
+  const source = await readFile(file, "utf8");
+  for (const match of source.matchAll(/<img\b[^>]*>/gi)) {
+    const tag = match[0];
+    const src = attributeValue(tag, "src");
+    const loading = attributeValue(tag, "loading").toLowerCase();
+    const decoding = attributeValue(tag, "decoding").toLowerCase();
+    const width = attributeValue(tag, "width");
+    const height = attributeValue(tag, "height");
+    const target = localTarget(src);
+    const targetFile = target ? await resolveTargetFile(file, target) : null;
+
+    if (loading !== "lazy") errors.push(`${name}: injected image ${src} must load lazily`);
+    if (decoding !== "async") errors.push(`${name}: injected image ${src} should use asynchronous decoding`);
+    if (!/^[1-9]\d*$/.test(width) || !/^[1-9]\d*$/.test(height)) {
+      errors.push(`${name}: injected image ${src} must have positive integer width and height attributes`);
+    }
+    if (!targetFile) continue;
+
+    const targetName = relative(targetFile);
+    publicImageReferences.add(targetName);
+    if (!dimensionCache.has(targetName)) dimensionCache.set(targetName, await imageDimensions(targetFile));
+    const intrinsic = dimensionCache.get(targetName);
+    if (!intrinsic) {
+      errors.push(`${name}: unable to validate intrinsic dimensions for ${src}`);
+    } else if (Number(width) !== intrinsic.width || Number(height) !== intrinsic.height) {
+      errors.push(`${name}: injected image ${src} dimensions must match ${intrinsic.width}x${intrinsic.height}`);
     }
   }
 }
@@ -231,9 +408,7 @@ for (const [name, expectedCanonical] of majorPublicPages) {
   }
 }
 
-const sitemapPath = path.join(root, "sitemap.xml");
 if (allRelative.has("sitemap.xml")) {
-  const sitemap = await readFile(sitemapPath, "utf8");
   const sitemapRoutes = [];
   for (const match of sitemap.matchAll(/<loc>https:\/\/lxephotography\.com([^<]*)<\/loc>/g)) {
     const route = match[1] || "/";
@@ -289,7 +464,13 @@ if (!metaValue(galleryPortalSource, "name", "robots").toLowerCase().includes("no
 const imageExtensions = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 for (const file of files.filter((candidate) => imageExtensions.has(path.extname(candidate).toLowerCase()))) {
   const size = (await stat(file)).size;
-  if (size > 2 * 1024 * 1024) warnings.push(`${relative(file)}: ${(size / 1024 / 1024).toFixed(1)} MB; consider a smaller web copy`);
+  if (size > 2 * 1024 * 1024) {
+    const name = relative(file);
+    const classification = publicImageReferences.has(name)
+      ? "referenced by a public page; byte reduction requires approved future asset processing"
+      : "not referenced by a public page; no current public-page delivery cost";
+    warnings.push(`${name}: ${(size / 1024 / 1024).toFixed(1)} MB; ${classification}`);
+  }
 }
 
 if (warnings.length) {
