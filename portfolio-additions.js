@@ -15,11 +15,11 @@
   story.setAttribute("aria-label", "More from this Lake Michigan engagement story");
   story.innerHTML = `
     <figure>
-      <img src="/public/images/portfolio/0395519F-D071-4C9D-BB0C-8AD5A4B259C4.png" alt="Engagement story photographed along the Lake Michigan shoreline" loading="lazy" decoding="async" />
+      <img src="/public/images/portfolio/0395519F-D071-4C9D-BB0C-8AD5A4B259C4.png" alt="Engagement story photographed along the Lake Michigan shoreline" width="1086" height="1448" loading="lazy" decoding="async" />
       <figcaption><span>Family &amp; engagement</span><span>Lake Michigan</span></figcaption>
     </figure>
     <figure>
-      <img src="/public/images/portfolio/IMG_8719.jpeg" alt="Engagement session photographed along the Lake Michigan shoreline" loading="lazy" decoding="async" />
+      <img src="/public/images/portfolio/IMG_8719.jpeg" alt="Engagement session photographed along the Lake Michigan shoreline" width="1365" height="2048" loading="lazy" decoding="async" />
       <figcaption><span>A joyful yes</span><span>Shoreline</span></figcaption>
     </figure>
   `;

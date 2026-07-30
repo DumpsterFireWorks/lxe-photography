@@ -62,7 +62,7 @@
     section.className = "saturday-mini-special section-anchor reveal visible";
     section.innerHTML = `
       <div class="saturday-mini-visual">
-        <img src="/public/images/portfolio/IMG_8719.jpeg" alt="A joyful engagement moment photographed along the Lake Michigan shoreline" loading="eager" decoding="async" />
+        <img src="/public/images/portfolio/IMG_8719.jpeg" alt="A joyful engagement moment photographed along the Lake Michigan shoreline" width="1365" height="2048" loading="lazy" decoding="async" />
         <div class="saturday-mini-badge">Saturday only</div>
       </div>
       <div class="saturday-mini-copy">
