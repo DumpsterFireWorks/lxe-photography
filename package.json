@@ -6,7 +6,7 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "preview": "wrangler dev --test-scheduled",
-    "check": "node --check script.js && node --check payment-ready.js && node --check client-galleries/client-galleries.js && node --check src/entry.js && node --check src/worker.js && node --check src/gallery-schema.js && node --check src/gallery-portal.js && node --check studio/studio.js && node --check gallery-portal.js",
+    "check": "node --check homepage-hero.js && node --check script.js && node --check payment-ready.js && node --check client-galleries/client-galleries.js && node --check src/entry.js && node --check src/worker.js && node --check src/gallery-schema.js && node --check src/gallery-portal.js && node --check studio/studio.js && node --check gallery-portal.js",
     "test": "node --test tests/*.test.js",
     "audit": "node .github/scripts/site-audit.mjs",
     "verify": "npm run check && npm test && npm run audit && wrangler deploy --dry-run",
