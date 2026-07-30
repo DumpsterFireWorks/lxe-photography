@@ -145,6 +145,8 @@
   font-size: clamp(2.5rem, 4.5vw, 4.5rem);
 }
 
+.client-access-note .eyebrow { color: rgba(255, 255, 255, 0.82); }
+
 .client-access-note > p {
   margin: 0;
   color: rgba(255, 255, 255, 0.78);

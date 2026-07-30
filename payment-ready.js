@@ -11,7 +11,7 @@
     wrapper.innerHTML = `
       <div class="secure-payment">
         <p class="payment-kicker">Payment after confirmation</p>
-        <h4>Simple, secure retainer payment.</h4>
+        <h3>Simple, secure retainer payment.</h3>
         <p id="payment-status">After Lexus confirms your date, she will send the approved payment instructions privately. A secure Square checkout for card and mobile-wallet payments is being prepared.</p>
         <a id="square-payment-link" class="button button-dark square-payment-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Pay the $25 retainer securely</a>
         <p id="square-payment-methods" class="payment-methods" hidden>Square checkout · card · Apple Pay · Google Pay</p>
@@ -69,17 +69,17 @@
         <p class="eyebrow">Hosted by Lexus + Lexus</p>
         <h2>Golden Hour Minis<br /><em>this Saturday.</em></h2>
         <p class="saturday-mini-date">Saturday, August 1 · 7:00–9:00 PM · Muskegon area</p>
-        <div class="saturday-mini-facts" aria-label="Golden hour mini session details">
-          <div><strong>$60</strong><span>session</span></div>
-          <div><strong>10 min</strong><span>photography</span></div>
-          <div><strong>10+</strong><span>edited photos</span></div>
+        <div class="saturday-mini-facts" role="list" aria-label="Golden hour mini session details">
+          <div role="listitem"><strong>$60</strong><span>session</span></div>
+          <div role="listitem"><strong>10 min</strong><span>photography</span></div>
+          <div role="listitem"><strong>10+</strong><span>edited photos</span></div>
         </div>
         <p>Perfect for couples, families, kids, maternity, best friends, or a quick portrait update. Sessions run back-to-back, so please arrive a few minutes early.</p>
         <p class="saturday-slot-label">Choose a time to request:</p>
         <div class="saturday-slot-grid">
           ${slots.map((slot) => `<button type="button" class="saturday-slot" data-slot="${slot}" aria-pressed="false">${slot}</button>`).join("")}
         </div>
-        <p class="saturday-slot-status" role="status" aria-live="polite"></p>
+        <p class="saturday-slot-status" role="status" aria-live="polite" aria-atomic="true"></p>
         <p class="saturday-mini-note">A time is not reserved until Lexus confirms it and receives the $25 retainer. Exact location details are provided after confirmation.</p>
       </div>
     `;
