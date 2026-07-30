@@ -32,7 +32,7 @@ const portfolioCategoryPages = new Map([
 ]);
 const privateRoutePrefixes = ["/studio", "/gallery", "/api"];
 const expectedLcpImages = new Map([
-  ["index.html", "/public/images/portfolio/family-beach-lift.jpg"],
+  ["index.html", "/public/images/portfolio/couples-beach-shore-kiss.jpg"],
   ["portfolio/index.html", "/public/images/portfolio/family-beach-lift.jpg"],
   ["portfolio/families/index.html", "/public/images/portfolio/family-beach-lift.jpg"],
   ["portfolio/couples-engagements/index.html", "/public/images/portfolio/couples-beach-shore-kiss.jpg"],
