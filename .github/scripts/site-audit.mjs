@@ -21,6 +21,15 @@ const majorPublicPages = new Map([
   ["policies.html", `${siteOrigin}/policies.html`],
   ["privacy.html", `${siteOrigin}/privacy.html`]
 ]);
+const portfolioCategoryPages = new Map([
+  ["portfolio/families/index.html", { canonical: `${siteOrigin}/portfolio/families/`, label: "Families" }],
+  ["portfolio/couples-engagements/index.html", { canonical: `${siteOrigin}/portfolio/couples-engagements/`, label: "Couples & Engagements" }],
+  ["portfolio/portraits-seniors/index.html", { canonical: `${siteOrigin}/portfolio/portraits-seniors/`, label: "Portraits & Seniors" }],
+  ["portfolio/children-lifestyle/index.html", { canonical: `${siteOrigin}/portfolio/children-lifestyle/`, label: "Children & Lifestyle" }],
+  ["portfolio/motherhood-newborns/index.html", { canonical: `${siteOrigin}/portfolio/motherhood-newborns/`, label: "Motherhood & Newborns" }],
+  ["portfolio/minis-seasonal/index.html", { canonical: `${siteOrigin}/portfolio/minis-seasonal/`, label: "Minis & Seasonal" }],
+  ["portfolio/pets-lifestyle/index.html", { canonical: `${siteOrigin}/portfolio/pets-lifestyle/`, label: "Pets & Lifestyle" }]
+]);
 const privateRoutePrefixes = ["/studio", "/gallery", "/api"];
 const expectedLcpImages = new Map([
   ["index.html", "/public/images/portfolio/family-beach-lift.jpg"],
@@ -566,6 +575,81 @@ for (const [name, expectedCanonical] of majorPublicPages) {
   ]) {
     if (values.has(value)) errors.push(`${name}: duplicate ${label} also used by ${values.get(value)}`);
     else values.set(value, name);
+  }
+}
+
+for (const [name, expected] of portfolioCategoryPages) {
+  const file = path.join(root, ...name.split("/"));
+  const html = await readFile(file, "utf8");
+  const breadcrumbMatches = [...html.matchAll(/<nav\b[^>]*aria-label=["']Breadcrumb["'][^>]*>([\s\S]*?)<\/nav>/gi)];
+
+  if (breadcrumbMatches.length !== 1) {
+    errors.push(`${name}: expected exactly one visible breadcrumb navigation`);
+  } else {
+    const breadcrumbHtml = breadcrumbMatches[0][1];
+    const links = [...breadcrumbHtml.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)]
+      .map((match) => ({ href: match[1], label: plainText(match[2]) }));
+    const expectedLinks = [
+      { href: "/", label: "Home" },
+      { href: "/portfolio/", label: "Portfolio" }
+    ];
+
+    if (JSON.stringify(links) !== JSON.stringify(expectedLinks)) {
+      errors.push(`${name}: breadcrumb links must be Home then Portfolio`);
+    }
+    for (const link of links) {
+      if (!(await targetExists(file, link.href))) errors.push(`${name}: breadcrumb target does not exist: ${link.href}`);
+    }
+
+    const currentMatches = [...breadcrumbHtml.matchAll(/<([a-z0-9]+)\b[^>]*aria-current=["']page["'][^>]*>([\s\S]*?)<\/\1>/gi)];
+    if (currentMatches.length !== 1 || plainText(currentMatches[0][2]) !== expected.label) {
+      errors.push(`${name}: breadcrumb current page must be marked as ${expected.label}`);
+    }
+  }
+
+  const canonical = canonicalValue(html);
+  if (canonical !== expected.canonical) errors.push(`${name}: breadcrumb page canonical must be ${expected.canonical}`);
+
+  const breadcrumbData = jsonLdValues(html, name).filter((block) => block?.["@type"] === "BreadcrumbList");
+  if (breadcrumbData.length !== 1) {
+    errors.push(`${name}: expected exactly one BreadcrumbList JSON-LD block`);
+    continue;
+  }
+
+  const expectedItems = [
+    { position: 1, name: "Home", item: `${siteOrigin}/` },
+    { position: 2, name: "Portfolio", item: `${siteOrigin}/portfolio/` },
+    { position: 3, name: expected.label, item: expected.canonical }
+  ];
+  const structured = breadcrumbData[0];
+  if (structured["@context"] !== "https://schema.org") errors.push(`${name}: BreadcrumbList must use the schema.org context`);
+  if (!Array.isArray(structured.itemListElement) || structured.itemListElement.length !== expectedItems.length) {
+    errors.push(`${name}: BreadcrumbList must contain three items`);
+    continue;
+  }
+
+  structured.itemListElement.forEach((item, index) => {
+    const expectedItem = expectedItems[index];
+    if (
+      item?.["@type"] !== "ListItem" ||
+      item.position !== expectedItem.position ||
+      item.name !== expectedItem.name ||
+      item.item !== expectedItem.item
+    ) {
+      errors.push(`${name}: invalid BreadcrumbList item at position ${index + 1}`);
+    }
+  });
+}
+
+for (const file of htmlFiles) {
+  const name = relative(file);
+  if (portfolioCategoryPages.has(name)) continue;
+  const html = await readFile(file, "utf8");
+  if (/<nav\b[^>]*aria-label=["']Breadcrumb["']/i.test(html)) {
+    errors.push(`${name}: breadcrumb navigation is limited to public portfolio categories`);
+  }
+  if (jsonLdValues(html, name).some((block) => block?.["@type"] === "BreadcrumbList")) {
+    errors.push(`${name}: BreadcrumbList JSON-LD is limited to public portfolio categories`);
   }
 }
 

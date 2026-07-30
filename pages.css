@@ -2,6 +2,52 @@
   padding-top: 0;
 }
 
+.breadcrumbs {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  color: var(--muted, #67695f);
+}
+
+.breadcrumbs ol {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.breadcrumbs li {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumbs li + li::before {
+  content: "/";
+  margin: 0 0.65rem;
+  color: #a3a092;
+}
+
+.breadcrumbs a,
+.breadcrumbs [aria-current="page"] {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.breadcrumbs a {
+  color: inherit;
+  text-underline-offset: 0.22em;
+}
+
+.breadcrumbs [aria-current="page"] {
+  color: var(--ink, #20221b);
+  font-weight: 600;
+}
+
 .page-hero {
   min-height: 58vh;
   display: grid;
