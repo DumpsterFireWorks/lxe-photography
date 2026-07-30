@@ -1,0 +1,66 @@
+name: Process Back to School portfolio intake
+
+on:
+  push:
+    branches:
+      - "portfolio/back-to-school-seasonal"
+    paths:
+      - "portfolio-intake/**"
+      - "scripts/process_back_to_school_intake.py"
+      - ".github/workflows/process-back-to-school-intake.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: process-back-to-school-intake
+  cancel-in-progress: false
+
+jobs:
+  process:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out intake branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install image tooling
+        run: python -m pip install --disable-pip-version-check pillow==11.3.0
+
+      - name: Process selected photographs
+        run: python scripts/process_back_to_school_intake.py
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install website dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+
+      - name: Run full repository verification
+        run: npm run verify
+
+      - name: Check patch formatting
+        run: git diff --check
+
+      - name: Remove one-time processing helpers
+        run: |
+          rm scripts/process_back_to_school_intake.py
+          rm .github/workflows/process-back-to-school-intake.yml
+
+      - name: Commit processed portfolio update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Add Back to School seasonal portfolio"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
