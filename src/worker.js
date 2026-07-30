@@ -169,7 +169,16 @@ function withSecurityHeaders(response, request) {
     headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   }
 
-  if (url.hostname.endsWith(".workers.dev")) {
+  const privateIndexingRoute =
+    isPrivateAssetPath(url.pathname) ||
+    url.pathname === "/studio" ||
+    url.pathname.startsWith("/studio/") ||
+    url.pathname === "/gallery" ||
+    url.pathname.startsWith("/gallery/") ||
+    url.pathname === "/api" ||
+    url.pathname.startsWith("/api/");
+
+  if (url.hostname.endsWith(".workers.dev") || privateIndexingRoute) {
     headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   }
 
