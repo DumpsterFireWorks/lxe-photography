@@ -8,6 +8,13 @@ on:
       - "portfolio-intake/**"
       - "scripts/process_back_to_school_intake.py"
       - ".github/workflows/process-back-to-school-intake.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "portfolio-intake/**"
+      - "scripts/process_back_to_school_intake.py"
+      - ".github/workflows/process-back-to-school-intake.yml"
 
 permissions:
   contents: write
@@ -21,10 +28,13 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
     steps:
       - name: Check out intake branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
 
       - name: Set up Python
@@ -63,4 +73,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Add Back to School seasonal portfolio"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:${TARGET_BRANCH}"
