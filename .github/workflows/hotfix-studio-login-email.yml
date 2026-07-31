@@ -1,0 +1,85 @@
+name: Hotfix studio login email delivery
+
+on:
+  push:
+    branches:
+      - "hotfix/studio-login-email-destination"
+    paths:
+      - "tests/studio-login-email.test.js"
+      - ".github/workflows/hotfix-studio-login-email.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hotfix-studio-login-email
+  cancel-in-progress: false
+
+jobs:
+  hotfix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out hotfix branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch studio email delivery
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("src/gallery-portal.js")
+          source = path.read_text(encoding="utf-8")
+
+          old_recipient = """async function sendStudioCode(env, code) {
+            await env.EMAIL.send({
+              to: ADMIN_EMAIL,"""
+          new_recipient = """async function sendStudioCode(env, code) {
+            await env.EMAIL.send({
+              to: PUBLIC_EMAIL,"""
+          if old_recipient not in source:
+              raise SystemExit("Expected studio email recipient block was not found")
+          source = source.replace(old_recipient, new_recipient, 1)
+
+          old_send = """  await sendStudioCode(env, code);
+            return json({ ok: true, message: \"A six-digit sign-in code was sent to Lexus.\" });"""
+          new_send = """  try {
+              await sendStudioCode(env, code);
+            } catch {
+              console.error(\"Studio sign-in email delivery failed.\");
+              return json({ ok: false, error: \"The sign-in code could not be sent. Please try again.\" }, 502);
+            }
+            return json({ ok: true, message: \"A six-digit sign-in code was sent to Lexus.\" });"""
+          if old_send not in source:
+              raise SystemExit("Expected studio email send block was not found")
+          source = source.replace(old_send, new_send, 1)
+
+          path.write_text(source, encoding="utf-8")
+          PY
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund --package-lock=false
+
+      - name: Verify hotfix
+        run: |
+          npm run verify
+          git diff --check
+
+      - name: Remove one-time workflow
+        run: rm .github/workflows/hotfix-studio-login-email.yml
+
+      - name: Commit hotfix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Fix Studio sign-in code delivery"
+          git push origin HEAD:hotfix/studio-login-email-destination
