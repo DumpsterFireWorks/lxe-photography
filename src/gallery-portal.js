@@ -124,7 +124,7 @@ async function readJson(request, maxBytes = 20_000) {
 
 async function sendStudioCode(env, code) {
   await env.EMAIL.send({
-    to: PUBLIC_EMAIL,
+    to: ADMIN_EMAIL,
     from: { email: PUBLIC_EMAIL, name: "LXE Photography Website" },
     replyTo: { email: ADMIN_EMAIL, name: "Lexus Erickson" },
     subject: "LXE Photography Studio sign-in code",

@@ -50,7 +50,7 @@ test("Cloudflare configuration has one destination-restricted EMAIL binding", as
   const config = JSON.parse(await readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8"));
   assert.deepEqual(config.send_email, [{
     name: "EMAIL",
-    destination_address: "hello@lxephotography.com"
+    destination_address: "lynnlexus421@gmail.com"
   }]);
 });
 
@@ -70,7 +70,7 @@ test("successful delivery uses the approved recipient, sender, Reply-To, subject
 
   assert.equal(response.status, 200);
   assert.deepEqual(await jsonBody(response), { ok: true });
-  assert.equal(sent.to, "hello@lxephotography.com");
+  assert.equal(sent.to, "lynnlexus421@gmail.com");
   assert.deepEqual(sent.from, {
     email: "hello@lxephotography.com",
     name: "LXE Photography Website"
@@ -144,7 +144,7 @@ test("untrusted values cannot inject email headers", async () => {
   assert.doesNotMatch(sent.replyTo.name, /[\r\n]/);
   assert.doesNotMatch(sent.subject, /[\r\n]/);
   assert.equal(sent.replyTo.email, "jamie@example.com");
-  assert.equal(sent.to, "hello@lxephotography.com");
+  assert.equal(sent.to, "lynnlexus421@gmail.com");
   assert.equal(sent.from.email, "hello@lxephotography.com");
 });
 

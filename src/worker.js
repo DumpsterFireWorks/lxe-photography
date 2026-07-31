@@ -1,7 +1,8 @@
 import { cleanupExpiredGalleries, handleGalleryApi, handleGalleryPage } from "./gallery-portal.js";
 
+const ADMIN_EMAIL = "lynnlexus421@gmail.com";
 const PUBLIC_EMAIL = "hello@lxephotography.com";
-const INQUIRY_DESTINATION = PUBLIC_EMAIL;
+const INQUIRY_DESTINATION = ADMIN_EMAIL;
 const EMAIL_FROM = "hello@lxephotography.com";
 const INQUIRY_WINDOW_MS = 15 * 60 * 1000;
 const INQUIRY_MAX_ATTEMPTS = 5;
