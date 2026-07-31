@@ -125,10 +125,17 @@ async function readJson(request, maxBytes = 20_000) {
 async function sendStudioCode(env, code) {
   await env.EMAIL.send({
     to: PUBLIC_EMAIL,
-    from: { email: PUBLIC_EMAIL, name: "LXE Photography Studio" },
-    subject: "Your LXE Studio sign-in code",
-    text: `Your LXE Photography Studio sign-in code is ${code}. It expires in 10 minutes. If you did not request this code, ignore this email.`,
-    html: `<h1>LXE Photography Studio</h1><p>Your sign-in code is:</p><p style="font-size:32px;font-weight:700;letter-spacing:8px">${code}</p><p>This code expires in 10 minutes.</p>`
+    from: { email: PUBLIC_EMAIL, name: "LXE Photography Website" },
+    replyTo: { email: ADMIN_EMAIL, name: "Lexus Erickson" },
+    subject: "LXE Photography Studio sign-in code",
+    text: [
+      "LXE Photography Studio sign-in",
+      "",
+      `Your six-digit code is ${code}.`,
+      "",
+      "This code expires in 10 minutes. If you did not request it, ignore this email."
+    ].join("\n"),
+    html: `<h1>LXE Photography Studio sign-in</h1><p>Your six-digit code is:</p><p><strong>${code}</strong></p><p>This code expires in 10 minutes. If you did not request it, ignore this email.</p>`
   });
 }
 
@@ -172,8 +179,8 @@ async function requestStudioCode(request, env) {
 
   try {
     await sendStudioCode(env, code);
-  } catch {
-    console.error("Studio sign-in email delivery failed.");
+  } catch (error) {
+    console.error("Studio sign-in email delivery failed.", error?.code || "UNKNOWN");
     return json({ ok: false, error: "The sign-in code could not be sent. Please try again." }, 502);
   }
   return json({ ok: true, message: "A six-digit sign-in code was sent to Lexus." });
