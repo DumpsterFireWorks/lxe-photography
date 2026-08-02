@@ -111,10 +111,22 @@
     .hero-image { object-position: var(--hero-desktop-position, 50% 42%); }
     .hero-note { color: rgba(255,255,255,.88); }
     .hero-copy h1,.hero-copy .hero-lede,.hero-copy .eyebrow,.hero-copy .hero-note,.hero-copy .light-link { text-shadow: 0 2px 18px rgba(0,0,0,.58),0 1px 2px rgba(0,0,0,.35); }
-    .home-seasonal-card { grid-column: 1 / -1; min-height: 480px !important; }
-    .home-seasonal-card img { object-position: center 38%; }
-    @media (max-width:820px){.home-seasonal-card{min-height:360px!important}}
-    @media (max-width:620px){.hero-image{object-position:var(--hero-mobile-position,50% 42%)!important}.hero-overlay{background:linear-gradient(90deg,rgba(17,19,14,.74) 0%,rgba(17,19,14,.48) 48%,rgba(17,19,14,.14) 100%),linear-gradient(180deg,rgba(17,19,14,.06) 0%,rgba(17,19,14,.20) 30%,rgba(17,19,14,.72) 67%,rgba(17,19,14,.95) 100%)!important}.home-seasonal-card{min-height:340px!important}.home-seasonal-card img{object-position:center 34%}}
+    .announcement a { color: inherit; text-decoration: none; }
+    .home-seasonal-promo { grid-column: 1 / -1; position: relative; min-height: 560px; display: flex; align-items: flex-end; overflow: hidden; background: #17190f; }
+    .home-seasonal-promo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
+    .home-seasonal-promo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(17,19,14,.88) 0%,rgba(17,19,14,.68) 48%,rgba(17,19,14,.22) 100%),linear-gradient(180deg,rgba(17,19,14,.06) 0%,rgba(17,19,14,.18) 42%,rgba(17,19,14,.84) 100%); }
+    .home-seasonal-promo-content { position: relative; z-index: 1; width: min(820px,100%); padding: clamp(28px,5vw,64px); color: #fff; }
+    .home-seasonal-promo-content h2 { margin: .35rem 0 .8rem; }
+    .home-seasonal-promo-copy { max-width: 650px; margin: 0 0 1.4rem; font-size: clamp(1rem,2vw,1.2rem); line-height: 1.65; }
+    .home-seasonal-pricing { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin: 0 0 1.35rem; }
+    .home-seasonal-option { display: flex; flex-direction: column; gap: 4px; min-height: 92px; padding: 14px; border: 1px solid rgba(255,255,255,.55); background: rgba(17,19,14,.44); color: #fff; text-decoration: none; backdrop-filter: blur(3px); }
+    .home-seasonal-option span { font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+    .home-seasonal-option strong { font-family: "Cormorant Garamond",serif; font-size: 2rem; font-weight: 500; line-height: 1; }
+    .home-seasonal-option small { color: rgba(255,255,255,.82); }
+    .home-seasonal-option:hover,.home-seasonal-option:focus-visible { background: rgba(255,255,255,.16); }
+    .home-seasonal-promo-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+    @media (max-width:820px){.home-seasonal-promo{min-height:600px}.home-seasonal-pricing{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:620px){.hero-image{object-position:var(--hero-mobile-position,50% 42%)!important}.hero-overlay{background:linear-gradient(90deg,rgba(17,19,14,.74) 0%,rgba(17,19,14,.48) 48%,rgba(17,19,14,.14) 100%),linear-gradient(180deg,rgba(17,19,14,.06) 0%,rgba(17,19,14,.20) 30%,rgba(17,19,14,.72) 67%,rgba(17,19,14,.95) 100%)!important}.home-seasonal-promo{min-height:760px;align-items:flex-end}.home-seasonal-promo>img{object-position:center 34%}.home-seasonal-promo::after{background:linear-gradient(180deg,rgba(17,19,14,.08) 0%,rgba(17,19,14,.34) 34%,rgba(17,19,14,.96) 70%)}.home-seasonal-promo-content{padding:26px 22px}.home-seasonal-promo-actions{align-items:stretch;flex-direction:column}.home-seasonal-promo-actions .button,.home-seasonal-promo-actions .text-link{width:100%;text-align:center}.home-seasonal-option{min-height:86px}}
   </style>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"LXE Photography","url":"https://lxephotography.com/","email":"hello@lxephotography.com","image":"https://lxephotography.com/portfolio/motherhood-newborns/IMG_8924.jpeg","priceRange":"$","founder":{"@type":"Person","name":"Lexus Erickson"},"areaServed":[{"@type":"City","name":"Muskegon"},{"@type":"AdministrativeArea","name":"West Michigan"}],"sameAs":["https://www.facebook.com/LXEPhotography/"]}</script>
   <script defer src="/config.js?v=20260729-4"></script>
@@ -123,7 +135,7 @@
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <div class="announcement" role="region" aria-label="Site announcement">Saturday Golden Hour Minis · August 1 · 7–9 PM · $60 · 10 minutes · 10+ photos</div>
+  <div class="announcement" role="region" aria-label="Site announcement"><a href="/contact/?session=Back%20to%20School%20Portraits&amp;message=I%20would%20like%20to%20book%20a%20Back%20to%20School%20package.%20Please%20send%20me%20the%20available%20dates%20before%20August%2018.">Back to School packages · $25–$55 · 10–15 photos · Booking through August 18</a></div>
   <header class="site-header">
     <a class="brand" href="/" aria-label="LXE Photography home"><span class="brand-mark">LXE</span><span class="brand-sub">PHOTOGRAPHY</span></a>
     <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation"><span></span><span></span><span></span></button>
@@ -139,9 +151,23 @@
     <section class="brand-statement" aria-label="LXE Photography philosophy"><p>For the soft smiles, wild little moments, and everyday stories that become the ones you miss most.</p></section>
 
     <section class="home-category-preview">
-      <div class="home-section-heading reveal"><p class="eyebrow">Browse by story</p><h2>A portfolio that grows<br /><em>with every season.</em></h2></div>
+      <div class="home-section-heading reveal"><p class="eyebrow">Now booking</p><h2>Back to school portraits<br /><em>for every age.</em></h2></div>
       <div class="category-grid">
-        <a class="category-card home-seasonal-card" href="/portfolio/minis-seasonal/"><img src="/public/images/portfolio/seasonal/back-to-school-chair-books.jpg" alt="Young student resting on books beside a Back to School chalkboard" width="1365" height="1706" loading="lazy" decoding="async" /><div class="category-card-copy"><p class="eyebrow light">Minis &amp; seasonal</p><h2>Back to school,<br />beautifully remembered.</h2></div></a>
+        <section class="home-seasonal-promo" aria-labelledby="back-to-school-promo-title">
+          <img src="/public/images/portfolio/seasonal/back-to-school-chair-books.jpg" alt="Young student resting on books beside a Back to School chalkboard" width="1365" height="1706" loading="lazy" decoding="async" />
+          <div class="home-seasonal-promo-content">
+            <p class="eyebrow light">Booking through August 18</p>
+            <h2 id="back-to-school-promo-title">Back to School<br /><em>packages for all ages.</em></h2>
+            <p class="home-seasonal-promo-copy">Each package includes 10–15 finished photographs. Tap the package you need and the booking inquiry will already be filled in for you.</p>
+            <div class="home-seasonal-pricing" aria-label="Back to School package prices">
+              <a class="home-seasonal-option" href="/contact/?session=Back%20to%20School%20Portraits&amp;message=I%20would%20like%20to%20book%20the%201-child%20Back%20to%20School%20package%20for%20%2425.%20Please%20send%20me%20the%20available%20dates%20before%20August%2018." aria-label="Book the one child Back to School package for 25 dollars"><span>1 child</span><strong>$25</strong><small>Book this package</small></a>
+              <a class="home-seasonal-option" href="/contact/?session=Back%20to%20School%20Portraits&amp;message=I%20would%20like%20to%20book%20the%202-child%20Back%20to%20School%20package%20for%20%2435.%20Please%20send%20me%20the%20available%20dates%20before%20August%2018." aria-label="Book the two child Back to School package for 35 dollars"><span>2 children</span><strong>$35</strong><small>Book this package</small></a>
+              <a class="home-seasonal-option" href="/contact/?session=Back%20to%20School%20Portraits&amp;message=I%20would%20like%20to%20book%20the%203-child%20Back%20to%20School%20package%20for%20%2445.%20Please%20send%20me%20the%20available%20dates%20before%20August%2018." aria-label="Book the three child Back to School package for 45 dollars"><span>3 children</span><strong>$45</strong><small>Book this package</small></a>
+              <a class="home-seasonal-option" href="/contact/?session=Back%20to%20School%20Portraits&amp;message=I%20would%20like%20to%20book%20the%204-child%20Back%20to%20School%20package%20for%20%2455.%20Please%20send%20me%20the%20available%20dates%20before%20August%2018." aria-label="Book the four child Back to School package for 55 dollars"><span>4 children</span><strong>$55</strong><small>Book this package</small></a>
+            </div>
+            <div class="home-seasonal-promo-actions"><a class="button button-light" href="/contact/?session=Back%20to%20School%20Portraits&amp;message=I%20would%20like%20to%20book%20a%20Back%20to%20School%20package.%20Please%20send%20me%20the%20available%20dates%20before%20August%2018.">Book Back to School</a><a class="text-link light-link" href="/portfolio/minis-seasonal/">See the Back to School portfolio <span aria-hidden="true">→</span></a></div>
+          </div>
+        </section>
         <a class="category-card" href="/portfolio/families/"><img src="/public/images/portfolio/family-beach-candid.jpg" alt="Family relaxing together in beach grass" width="1024" height="1456" loading="lazy" decoding="async" /><div class="category-card-copy"><p class="eyebrow light">Families</p><h2>Real life,<br />held still.</h2></div></a>
         <a class="category-card" href="/portfolio/couples-engagements/"><img src="/public/images/portfolio/couples-beach-shore-kiss.jpg" alt="Couple beside the shoreline" width="1024" height="1280" loading="lazy" decoding="async" /><div class="category-card-copy"><p class="eyebrow light">Couples &amp; engagements</p><h2>Close and<br />completely yours.</h2></div></a>
         <a class="category-card" href="/portfolio/portraits-seniors/"><img src="/portfolio/04-seated-blue-dress-portrait.jpeg" alt="Seated outdoor portrait in a blue dress" width="1461" height="2048" loading="lazy" decoding="async" /><div class="category-card-copy"><p class="eyebrow light">Portraits &amp; seniors</p><h2>Confident,<br />comfortable, you.</h2></div></a>
